@@ -1,4 +1,4 @@
-<img src="asura.png" width=200 height=200>
+B<img src="asura.png" width=200 height=200>
 
 Currently, Asura can process 76,835,550 packets in 200-400 minutes.
 
@@ -30,8 +30,7 @@ run this command:
 # ./auto.sh 10 7 10 5 demo
 </pre>
 
-Output is like this:
-The lower the percentage is, the more it is worth inspecting in detail.
+Output is like this. The low percentage means that it is worth inspecting in detail.
 <pre>
 sourceIP, destIP, clusterSize, anomaly rate
 *.*.*.*,*.*.*.*,2,1.17647%
