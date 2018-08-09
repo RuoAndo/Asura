@@ -1,3 +1,5 @@
+<img src="asura.png">
+
 # Quick test
 
 Put any PCAP files in the directory:
@@ -6,6 +8,13 @@ Put any PCAP files in the directory:
 # mv *.pcap ./demo
 # ls demo/
 1.pcap 2.pcap 3.pcap
+</pre>
+
+or
+<pre>
+# cd demo
+# wget http://.../*.pcap
+# cd ..
 </pre>
 
 run this command:
@@ -23,5 +32,5 @@ sourceIP, destIP, clusterSize, anomaly rate
 
 Browse all results:
 <pre>
-cat result
+# cat result
 </pre>
