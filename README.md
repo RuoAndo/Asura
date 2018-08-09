@@ -1,4 +1,4 @@
-<img src="asura.png">
+<img src="asura.png" width=50% height=50%>
 
 # Quick test
 
