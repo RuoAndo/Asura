@@ -1,13 +1,13 @@
 <img src="asura.png" width=200 height=200>
 
+Currently, Asura can process 76,835,550 packets in 200-400 minutes.
+
 # Quick test
 
 Put any PCAP files in the directory:
 <pre>
 # mkdir demo
 # mv *.pcap ./demo
-# ls demo/
-1.pcap 2.pcap 3.pcap
 </pre>
 
 or
@@ -17,8 +17,16 @@ or
 # cd ..
 </pre>
 
+<pre>
+# ls demo/
+1.pcap 2.pcap 3.pcap
+</pre>
+
 run this command:
 <pre>
+# ./auto.sh
+./auto.sh nThread nDimensions nClusters nItems DIR
+
 # ./auto.sh 10 7 10 5 demo
 </pre>
 
