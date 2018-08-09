@@ -100,7 +100,15 @@ today=$(date "+%Y%m%d")
 hostname=`hostname`
 
 python count-percent.py count-result > count-percent
-python count-grep.py count-percent result-all > tmp3
-./sort-percent.pl tmp3 > tmp3-sorted
+python count-grep.py count-percent result-all > tmp
 
+rm -rf result
+touch result
+
+echo "sourceIP, destIP, clusterSize, anomaly rate" > result
+./sort-percent.pl tmp | sed -e 's/$/%/' >> result
+
+echo " "
+echo "### RESULT ###"
+head -n 20 result
 

@@ -17,15 +17,7 @@ nClusters=$4
 nItems=$5 # nDimensions-2 / items: src dst n[* * *] 
 TAG=$6
 
-rm -rf process
-rm -rf process2
-rm -rf SSE
-
-rm -rf *lbl
-rm -rf *rlbl
-rm -rf hout*
-rm -rf iplist*
-rm -rf count-percent-*
+./clean.sh
 
 grep THREAD_NUM init-label.cpp | grep define
 echo "the numbers of threads\:"$nThreads
