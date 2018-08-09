@@ -31,6 +31,7 @@ run this command:
 </pre>
 
 Output is like this:
+The lower the percentage is, the more it is worth inspecting in detail.
 <pre>
 sourceIP, destIP, clusterSize, anomaly rate
 *.*.*.*,*.*.*.*,2,1.17647%
