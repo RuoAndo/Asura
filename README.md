@@ -17,6 +17,13 @@ or
 # cd ..
 </pre>
 
+Publicly available PCAP files
+<pre>
+https://www.netresec.com/?page=MACCDC
+https://github.com/chrissanders/packets
+</pre>
+
+PCAP files under the directory:
 <pre>
 # ls demo/
 1.pcap 2.pcap 3.pcap
