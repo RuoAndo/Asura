@@ -1,4 +1,4 @@
-B<img src="asura.png" width=200 height=200>
+<img src="asura.png" width=200 height=200>
 
 Currently, Asura can process 76,835,550 packets in 200-400 minutes.
 
@@ -17,7 +17,7 @@ or
 # cd ..
 </pre>
 
-Publicly available PCAP files
+(recommended) Publicly available PCAP files
 <pre>
 https://www.netresec.com/?page=MACCDC
 https://github.com/chrissanders/packets
