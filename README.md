@@ -1,4 +1,5 @@
 <img src="asura.png" width=200 height=200>
+PLAN: Cocurrent hash map (Intel TBB) is going to be adopted: 2018.10-2018.11
 
 Currently, Asura can process 76,835,550 packets in 200-400 minutes.
 
