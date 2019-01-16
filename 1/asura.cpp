@@ -34,11 +34,13 @@
 
 using namespace std;
 
-#define N 3
+#define N 2
 #define WORKER_THREAD_NUM N
 #define MAX_QUEUE_NUM N
 #define END_MARK_FNAME   "///"
 #define END_MARK_FLENGTH 3
+
+#define DISP_FREQ 100000
 
 /* srcIP, destIP */
 typedef struct _addrpair {
@@ -58,7 +60,6 @@ typedef struct _reduced {
 } reduced_t;
 reduced_t reduced;
 
-// static int counter = 0;
 static int chksum = 0;
 
 struct pseudo_ip{
@@ -334,244 +335,6 @@ int AnalyzeIp(u_char *data,int size)
   return(0);
 }
 
-int PrintTcp(struct tcphdr *tcphdr,FILE *fp)
-{
-	fprintf(fp,"tcp-------------------------------------\n");
-
-        fprintf(fp,"source=%u,",ntohs(tcphdr->source));
-        fprintf(fp,"dest=%u\n",ntohs(tcphdr->dest));
-        fprintf(fp,"seq=%u\n",ntohl(tcphdr->seq));
-        fprintf(fp,"ack_seq=%u\n",ntohl(tcphdr->ack_seq));
-        fprintf(fp,"doff=%u,",tcphdr->doff);
-        fprintf(fp,"urg=%u,",tcphdr->urg);
-        fprintf(fp,"ack=%u,",tcphdr->ack);
-        fprintf(fp,"psh=%u,",tcphdr->psh);
-        fprintf(fp,"rst=%u,",tcphdr->rst);
-        fprintf(fp,"syn=%u,",tcphdr->syn);
-        fprintf(fp,"fin=%u,",tcphdr->fin);
-        fprintf(fp,"th_win=%u\n",ntohs(tcphdr->window));
-        fprintf(fp,"th_sum=%u,",ntohs(tcphdr->check));
-        fprintf(fp,"th_urp=%u\n",ntohs(tcphdr->urg_ptr));
-
-	return(0);
-}
-
-int AnalyzeTcp(u_char *data,int size)
-{
-  u_char	*ptr;
-  int	lest;
-  struct tcphdr	*tcphdr;
-
-  ptr=data;
-  lest=size;
-
-  if(lest<sizeof(struct tcphdr)){
-    fprintf(stderr,"lest(%d)<sizeof(struct tcphdr)\n",lest);
-    return(-1);
-  }
-
-  tcphdr=(struct tcphdr *)ptr;
-  ptr+=sizeof(struct tcphdr);
-  lest-=sizeof(struct tcphdr);
-
-  PrintTcp(tcphdr,stdout);
-	
-  return(0);
-}
-
-char *tcp_ftoa(int flag)
-{
-  static int  f[] = {'U', 'A', 'P', 'R', 'S', 'F'};
-  
-#define TCP_FLG_MAX (sizeof f / sizeof f[0])
-  static char str[TCP_FLG_MAX + 1];            
-  unsigned int mask = 1 << (TCP_FLG_MAX - 1);  
-  int i;                                       
-
-  for (i = 0; i < TCP_FLG_MAX; i++) {
-    if (((flag << i) & mask) != 0)
-      str[i] = f[i];
-    else
-      str[i] = '0';
-  }
-  str[i] = '\0';
-
-  return str;
-}
-
-
-
-int AnalyzeIp2(u_char *data,int size)
-{
-  u_char*ptr;
-  int lest;
-  struct iphdr*iphdr;
-  u_char*option;
-  int optionLen,len;
-  unsigned short  sum;
-
-  struct tcphdr *tcp;
-  struct udphdr *udp;
-
-  int map_counter = 0;
-  
-  ptr=data;
-  lest=size;
-
-  map<string, string> myAddrPair;
-
-  string src;
-  string dst;
-  
-  int tlen = 0;
-  int ttl = 0;
-
-  int sport = 0;
-  int dport = 0;
-  
-  int count = 0;
-  
-  pthread_mutex_lock(&addrpair.mutex);
-  myAddrPair = addrpair.m;
-  pthread_mutex_unlock(&addrpair.mutex); 
-  
-  if(lest<sizeof(struct iphdr)){
-    fprintf(stderr,"lest(%d)<sizeof(struct iphdr)\n",lest);
-    return(-1);
-  }
-  iphdr=(struct iphdr *)ptr;
-  ptr+=sizeof(struct iphdr);
-  lest-=sizeof(struct iphdr);
-
-  optionLen=iphdr->ihl*4-sizeof(struct iphdr);
-  if(optionLen>0){
-    if(optionLen>=1500){
-      fprintf(stderr,"IP optionLen(%d):too big\n",optionLen);
-      // return(-1);
-    }
-    option=ptr;
-    ptr+=optionLen;
-    lest-=optionLen;
-  }
-
-  if(iphdr->protocol == IPPROTO_TCP)
-    {
-      tcp = (struct tcphdr *) ptr;
-      ptr += ((int) (tcp->th_off) << 2);   
-
-      sport = ntohs(tcp->th_sport);
-      dport = ntohs(tcp->th_dport);
-           
-    }
-
-  /* reduce */
-  
-  map<string, string>::iterator itr;
-
-  /* retrivel from header */
-  src = inet_ntoa(*(struct in_addr *) &(iphdr->saddr));
-  dst = inet_ntoa(*(struct in_addr *) &(iphdr->daddr));
-  tlen = ntohs(iphdr->tot_len);
-  ttl = iphdr->ttl;
-
-  map_counter = 0;
-  for (itr = myAddrPair.begin(); itr != myAddrPair.end(); itr++)
-    {
-      if(src == itr->first && dst == itr->second) {
-
-	pthread_mutex_lock(&reduced.mutex);
-	std::map<int, int>::iterator it; 
-	
-	it = reduced.count.find(map_counter);
-	if(it == reduced.count.end())
-	  {
-	    reduced.count.insert(std::make_pair(map_counter, 1));
-	  }
-	else
-	  {
-	    count = (int)it->second + 1;
-	    reduced.count.erase(map_counter);
-	    reduced.count.insert(std::make_pair(map_counter, count));
-	  }   
-
-	/* tlen */
-	it = reduced.tlen.find(map_counter);
-	if(it == reduced.tlen.end())
-	  {
-	    reduced.tlen.insert(std::make_pair(map_counter, tlen));
-	  }
-	else
-	  {
-	    tlen = tlen + (int)it->second;
-	    reduced.tlen.erase(map_counter);
-	    reduced.tlen.insert(std::make_pair(map_counter, tlen));
-	  }
-
-	/* ttl */
-	it = reduced.ttl.find(map_counter);
-	if(it == reduced.ttl.end())
-	  {
-	    reduced.ttl.insert(std::make_pair(map_counter, ttl));
-	  }
-	else
-	  {
-	    ttl = ttl + (int)it->second;
-	    reduced.ttl.erase(map_counter);
-	    reduced.ttl.insert(std::make_pair(map_counter, ttl));
-	  }
-
-	/* sport */
-	it = reduced.sport.find(map_counter);
-	if(it == reduced.sport.end())
-	  {
-	    reduced.sport.insert(std::make_pair(map_counter, sport));
-	  }
-	else
-	  {
-	    sport = sport + (int)it->second;
-	    reduced.sport.erase(map_counter);
-	    reduced.sport.insert(std::make_pair(map_counter, sport));
-	  }
-
-	/* dport */
-	it = reduced.dport.find(map_counter);
-	if(it == reduced.dport.end())
-	  {
-	    reduced.dport.insert(std::make_pair(map_counter, dport));
-	  }
-	else
-	  {
-	    dport = dport + (int)it->second;
-	    reduced.dport.erase(map_counter);
-	    reduced.dport.insert(std::make_pair(map_counter, dport));
-	  }   
-		
-	pthread_mutex_unlock(&reduced.mutex);  
-      }
-      map_counter++;
-    }
- 
-  return(0);
-}
-
-int traverse_buffer2(char* buf, int thread_id, char* filename)
-{
-  regex_t preg;
-  char *regex ="([0-9]{3})\\.([0-9]{3})\\.([0-9]{3})\\.([0-9]{3})";
-  regmatch_t   pmatch[5];
-
-  FILE *file;
-
-  regcomp(&preg,regex,REG_EXTENDED|REG_NEWLINE);
-    
-  if( regexec(&preg,buf,5,pmatch,0) != REG_NOMATCH ) {
-      return 1;
-    }  
-
-   regfree(&preg);
-   return 0;
-}
-
 int traverse_file(char* filename, char* srchstr, int thread_id) {
     char buf[256];
     int n = 0, sumn = 0;
@@ -597,7 +360,6 @@ int traverse_file(char* filename, char* srchstr, int thread_id) {
       return 0;
     }
 
-
     for(;;){
       
       if((data = getc(fp) ) == EOF){
@@ -623,7 +385,8 @@ int traverse_file(char* filename, char* srchstr, int thread_id) {
 	      sprintf(tmp, "%02X", data);
 	      if(strcmp(tmp, s3)==0)
 		{
-		  if(thread_id % WORKER_THREAD_NUM == 0)
+		  //if(thread_id % WORKER_THREAD_NUM == 0)
+		  if(counter % DISP_FREQ == 0)
 		    printf("worker1:threadID:%d:filename:%s IP 080045:counter:%d\n", thread_id, filename, counter);
 		  
 		  fseek(fp,-1.5L,SEEK_CUR);
@@ -640,81 +403,6 @@ int traverse_file(char* filename, char* srchstr, int thread_id) {
 	  disp_counter++;
 	} // if(strcmp(tmp,s1) *s1 = "08";
       
-    } // for (;;)
-
-    fclose(fp);
-    return sumn;
-}
-
-
-int traverse_file2(char* filename, char* srchstr, int thread_id) {
-    char buf[256];
-    int n = 0, sumn = 0;
-
-    FILE    *fp;
-    int     data;	
-    char    tmp[256];
-    
-    char    *s1 = "08";
-    char    *s2 = "00";
-    char    *s3 = "45";
-
-    int j;
-    
-    u_char *ptr;
-	
-    int counter = 0;
-	
-    fp = fopen(filename, "rb");
-    if(fp == NULL){
-      printf("file cannot be opened. \n");
-      return 0;
-    }
-
-    for(;;){
-      
-      if((data = getc(fp) ) == EOF){
-	// printf("\n");
-	fclose(fp); return 1;}
-      
-      /* init */
-      for(j=0;j<256;j++)
-	tmp[j] = 0;
-      for(j=0;j<256;j++)
-	buf[j] = 0;
-	  
-      sprintf(tmp, "%02X", data);
-      if(strcmp(tmp, s1)==0)
-	{
-	  data = getc(fp);	
-	  sprintf(tmp, "%02X", data);
-	  
-	  if(strcmp(tmp, s2)==0)
-	    {
-	      data = getc(fp);
-	      sprintf(tmp, "%02X", data);
-
-	      sprintf(tmp, "%02X", data);
-	      if(strcmp(tmp, s3)==0)
-		{
-		  if(thread_id % WORKER_THREAD_NUM == 0)
-		    {
-		      printf("worker2:threadID:%d:filename:%s IP 080045:counter:%d \n", thread_id, filename, counter);
-		    }
-		  
-		  fseek(fp,-1.5L,SEEK_CUR);
-		  if (fgets(buf, sizeof(struct iphdr)+8, fp) != NULL)
-		    {
-		      ptr = buf;
-		      AnalyzeIp2(ptr,sizeof(struct iphdr));
-		      counter = counter + 1;
-		    }
-		  fseek(fp,-3L,SEEK_CUR);
-		}
-	      
-	    } // if(strcmp(tmp,s2)	      
-	} // if(strcmp(tmp,s1) *s1 = "08";
-	    
     } // for (;;)
 
     fclose(fp);
@@ -840,6 +528,8 @@ void worker_func(thread_arg_t* arg) {
 
     int thread_id = arg->id;
 
+    printf("worker func %d launched \n", thread_id);
+    
 #ifdef __CPU_SET
     cpu_set_t mask;    
     __CPU_ZERO(&mask);
@@ -901,56 +591,6 @@ void worker_func(thread_arg_t* arg) {
     return;
 }
 
-void worker_func2(thread_arg_t* arg) {
-    int flen;
-    char* fname = NULL;
-    queue_t* q = arg->q;
-    char* srchstr = arg->srchstr;
-
-    int thread_id = arg->id;
-    printf("DEBUG: %d \n", arg->id);
-
-#ifdef __CPU_SET
-    cpu_set_t mask;    
-    __CPU_ZERO(&mask);
-    __CPU_SET(arg->cpuid, &mask);
-    if (sched_setaffinity(0, sizeof(mask), &mask) == -1)
-        printf("WARNING: faild to set CPU affinity...\n");
-#endif
-
-#if 0
-    while (1) {
-        int n;
-
-        dequeue(q, &fname, &flen));
-
-        if (strncmp(fname, END_MARK_FNAME, END_MARK_FLENGTH + 1) == 0)
-            break;
-
-	printf("worker2 %s \n", fname);
-	n = traverse_file2(fname, srchstr, thread_id);
-
-    }
-#else
-    char* my_result_fname;
-    int my_result_num = 0;
-    int my_result_len = 0;
-    while (1) {
-        int n;
-
-        dequeue(q, &fname, &flen);
-
-        if (strncmp(fname, END_MARK_FNAME, END_MARK_FLENGTH + 1) == 0)
-            break;
-
-	printf("worker2 %s \n", fname);
-        n = traverse_file2(fname, srchstr, thread_id);
-    }
-
-#endif
-    return;
-}
-
 void print_result(thread_arg_t* arg) {
     if (result.num) {
         printf("Total %d files\n", arg->filenum);
@@ -1000,98 +640,8 @@ int main(int argc, char* argv[]) {
         targ[i].id = i;
         pthread_create(&worker[i], NULL, (void*)worker_func, (void*)&targ[i]);
       }
-
     for (i = 1; i < thread_num; ++i) 
         pthread_join(worker[i], NULL);
-
-    /* second scatter */
-    
-    pthread_create(&master, NULL, (void*)master_func, (void*)&targ[0]);
-    for (i = 1; i < thread_num; ++i)
-      { 
-        targ[i].id = i;
-        pthread_create(&worker2[i], NULL, (void*)worker_func2, (void*)&targ[i]);
-      }
-
-    for (i = 1; i < thread_num; ++i) 
-        pthread_join(worker2[i], NULL);
-
-    map<int, int>::iterator itr2;
-    std::vector<int> vcount;
-    std::vector<int> vtlen;
-    std::vector<int> vttl;
-    std::vector<int> vsport;
-    std::vector<int> vdport;       
-
-    for (itr2 = reduced.count.begin(); itr2 != reduced.count.end(); itr2++)
-      {
-	vcount.push_back(itr2->second);
-	// counter = counter + 1;
-      }
-
-    for (itr2 = reduced.tlen.begin(); itr2 != reduced.tlen.end(); itr2++)
-      {
-	vtlen.push_back(itr2->second);
-	// counter = counter + 1;
-      }
-
-    for (itr2 = reduced.ttl.begin(); itr2 != reduced.ttl.end(); itr2++)
-      {
-	vttl.push_back(itr2->second);
-	// counter = counter + 1;
-      }
-
-    for (itr2 = reduced.sport.begin(); itr2 != reduced.sport.end(); itr2++)
-      {
-	vsport.push_back(itr2->second);
-	// counter = counter + 1;
-      }
-
-    for (itr2 = reduced.dport.begin(); itr2 != reduced.dport.end(); itr2++)
-      {
-	vdport.push_back(itr2->second);
-	// counter = counter + 1;
-      }               
-    
-    pthread_mutex_lock(&result.mutex);
-    myAddrPair = addrpair.m;
-    pthread_mutex_unlock(&result.mutex);      
-
-    pthread_mutex_lock(&addrpair.mutex);  
-
-    ofstream outputfile("reduced"); 
-    
-    map<string, string>::iterator itr;
-    map_counter = 0;
-    for (itr = myAddrPair.begin(); itr != myAddrPair.end(); itr++)
-      {
-	/*
-	printf("%s,%s,", itr->first.c_str(), itr->second.c_str());
-	*/
-
-	if(map_counter % 1000 == 0)
-	  {
-	    std::cout << itr->first.c_str() << "," << itr->second.c_str() << "," << vcount[map_counter] << "," << vtlen[map_counter] << "," << vttl[map_counter] << "," << vsport[map_counter] << "," << vdport[map_counter] << std::endl;
-	  }
-
-	outputfile << itr->first.c_str() << "," << itr->second.c_str() << "," << vcount[map_counter] << "," << vtlen[map_counter] << "," << vttl[map_counter] << "," << vsport[map_counter] << "," << vdport[map_counter] << std::endl;
-	
-	map_counter++;
-      }
-
-    outputfile.close(); 
-    pthread_mutex_unlock(&addrpair.mutex);  
-    
-    printf("map_counter:%d\n", map_counter);
-    
-    travdirtime = stop_timer(&t);
-    print_timer(travdirtime);
-
-    print_result(&targ[0]);
-    for (i = 1; i < thread_num; ++i) {
-        if ((targ[i].q)->fname[i] != NULL) free((targ[i].q)->fname[i]);
-    }
-    if(result.fname != NULL) free(result.fname);
     
     return 0;
 }
