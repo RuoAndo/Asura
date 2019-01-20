@@ -1,8 +1,10 @@
 Asura 1 adopting concurrent hash map of Intel TBB.
 This version is faster than verion 0 (DEFCON26) which uses mutex. 
 
+<pre>
 PLAN1: implementing second scatter in version 0. / 2019.01 - 2019.02
 PLAN2: adopting bitset<> for faster reduction. / 2019.01 - 2019.02
+</pre>
 
 usage:
 
