@@ -6,6 +6,14 @@ Currently, Asura can process 76,835,550 packets in 200-400 minutes.
 2019.01.22: directory "1" and "2" newly added which is going to be adopt concurrent hashmap (lock-free) of Intel TBB. 
 <pre>
 1: stl wrapped by mutex
+   pthread: worker_func1
+		|
+		|--- traverse_file1
+			|
+			|--- analyseIP
+				|
+				|--- ProcIPHeaer
+
 2: hash table by Intel TBB
 </pre>
 
