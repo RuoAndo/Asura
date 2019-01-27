@@ -3,18 +3,31 @@ PLAN: Cocurrent hash map (Intel TBB) is going to be adopted: 2018.10-2018.11
 
 Currently, Asura can process 76,835,550 packets in 200-400 minutes.
 
-2019.01.22: directory "1" and "2" newly added which is going to be adopt concurrent hashmap (lock-free) of Intel TBB. 
+2019.01.22: directory "1", "2" and "3" newly added which is going to be adopt concurrent hashmap (lock-free) of Intel TBB. 
 <pre>
 1: stl wrapped by mutex
-   pthread: worker_func1
+   pthread --- worker_func1
 		|
 		|--- traverse_file1
 			|
 			|--- analyseIP
 				|
-				|--- ProcIPHeaer
+				|--- ProcIPHeader
 
 2: hash table by Intel TBB
+
+3: stl wrapped by mutex
+   pthread ---- worker_func1
+	    |	|
+	    |	|--- traverse_file1
+	    |		|
+            |		|--- analyseIP
+	    |			|
+	    |			|--- ProcIPHeader
+            |
+	    |-- worker_func2
+	        |
+		|--- ...
 </pre>
 
 # Quick test
