@@ -409,6 +409,81 @@ int traverse_file(char* filename, char* srchstr, int thread_id) {
     return sumn;
 }
 
+int traverse_file2(char* filename, char* srchstr, int thread_id) {
+    char buf[256];
+    int n = 0, sumn = 0;
+
+    FILE    *fp;
+    int     data;	
+    char    tmp[256];
+    
+    char    *s1 = "08";
+    char    *s2 = "00";
+    char    *s3 = "45";
+
+    int j;
+    
+    u_char *ptr;
+	
+    int counter = 0;
+	
+    fp = fopen(filename, "rb");
+    if(fp == NULL){
+      printf("file cannot be opened. \n");
+      return 0;
+    }
+
+    for(;;){
+      
+      if((data = getc(fp) ) == EOF){
+	// printf("\n");
+	fclose(fp); return 1;}
+      
+      /* init */
+      for(j=0;j<256;j++)
+	tmp[j] = 0;
+      for(j=0;j<256;j++)
+	buf[j] = 0;
+	  
+      sprintf(tmp, "%02X", data);
+      if(strcmp(tmp, s1)==0)
+	{
+	  data = getc(fp);	
+	  sprintf(tmp, "%02X", data);
+	  
+	  if(strcmp(tmp, s2)==0)
+	    {
+	      data = getc(fp);
+	      sprintf(tmp, "%02X", data);
+
+	      sprintf(tmp, "%02X", data);
+	      if(strcmp(tmp, s3)==0)
+		{
+		  if(counter % 1000==0 && counter > 0)
+		    printf("worker2:threadID:%d:filename:%s IP 080045:counter:%d \n", thread_id, filename, counter);
+		   
+		  /*
+		  fseek(fp,-1.5L,SEEK_CUR);
+		  if (fgets(buf, sizeof(struct iphdr)+8, fp) != NULL)
+		    {
+		      ptr = buf;
+		      AnalyzeIp2(ptr,sizeof(struct iphdr));
+		      counter = counter + 1;
+		    }
+		  fseek(fp,-3L,SEEK_CUR);
+		  */
+		  counter++;
+		}
+	      
+	    } // if(strcmp(tmp,s2)	      
+	} // if(strcmp(tmp,s1) *s1 = "08";
+	    
+    } // for (;;)
+
+    fclose(fp);
+    return sumn;
+}
+
 void initqueue(queue_t* q) {
     int i;
     q->rp = q->wp = q->remain= 0;
@@ -598,7 +673,7 @@ void worker_func2(thread_arg_t* arg) {
     char* srchstr = arg->srchstr;
 
     int thread_id = arg->id;
-    printf("DEBUG: %d \n", arg->id);
+    // printf("DEBUG: %d \n", arg->id);
 
 #ifdef __CPU_SET
     cpu_set_t mask;    
@@ -617,8 +692,10 @@ void worker_func2(thread_arg_t* arg) {
         if (strncmp(fname, END_MARK_FNAME, END_MARK_FLENGTH + 1) == 0)
             break;
 
+	/*
 	printf("worker2 %s \n", fname);
 	n = traverse_file2(fname, srchstr, thread_id);
+	*/
 
     }
 #else
@@ -632,12 +709,10 @@ void worker_func2(thread_arg_t* arg) {
 
         if (strncmp(fname, END_MARK_FNAME, END_MARK_FLENGTH + 1) == 0)
             break;
-
-	printf("worker2 %s \n", fname);
 	
-	/*
+	printf("worker2 %s \n", fname);
         n = traverse_file2(fname, srchstr, thread_id);
-	*/
+
     }
     pthread_mutex_unlock(&result.mutex);
 #endif
