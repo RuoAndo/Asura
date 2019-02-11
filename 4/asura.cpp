@@ -77,6 +77,9 @@ static CharTable table;
 typedef concurrent_hash_map<std::string, int> CharTable2;
 static CharTable2 table2;
 
+typedef concurrent_hash_map<unsigned long long, int> CharTable3;
+static CharTable3 table3;
+
 /* reduced */
 typedef struct _reduced {
   map<int, int> count;
@@ -373,6 +376,12 @@ int ProcIpHeader(struct iphdr *iphdr,u_char *option,int optionLen,FILE *fp)
   table2.insert(a2, IPstring);
   a2->second = tlen;     
 
+  unsigned long long n = bitset<64>(IPstring).to_ullong();    
+
+  CharTable3::accessor a3;
+  table3.insert(a3, n);
+  a3->second += 1;     
+  
   /*
   pthread_mutex_lock(&addrpair.mutex);
   addrpair.m.insert(pair<string, string>(saddr,daddr));
@@ -737,23 +746,49 @@ int main(int argc, char* argv[]) {
     for (i = 1; i < thread_num; ++i) 
         pthread_join(worker[i], NULL);
 
+    std::remove("tmp1");
+    ofstream outputfile("tmp1");
+    
     int counter = 0;
     for( CharTable::iterator i=table.begin(); i!=table.end(); ++i )
     {
-      std::cout << i->first << "," << i->second << endl;
-     
+      // std::cout << i->first << "," << i->second << endl;
+      outputfile << i->first << endl; // "," << i->second << endl;
+      
       counter = counter + 1;
     }
 
+    outputfile.close();
+
+    std::remove("tmp2");
+    ofstream outputfile2("tmp2");
+    
     std::cout << "table2" << endl;
 
     counter = 0;
     for( CharTable2::iterator i=table2.begin(); i!=table2.end(); ++i )
     {
-      std::cout << i->first << "," << i->second << endl;
-     
+      // std::cout << i->first << "," << i->second << endl;
+      outputfile2 << i->first << "," << i->second << endl;
+      
       counter = counter + 1;
     }
+    outputfile2.close();
+    
+    std::cout << "table3" << endl;
+
+    std::remove("tmp3");
+    ofstream outputfile3("tmp3");
+    
+    counter = 0;
+    for( CharTable3::iterator i=table3.begin(); i!=table3.end(); ++i )
+    {
+      std::cout << i->first << "," << i->second << endl;
+      outputfile3 << i->first << "," << i->second << endl;
+      counter = counter + 1;
+    }
+
+    outputfile3.close();
   
     // map<string, string> myAddrPair;
 
