@@ -1,4 +1,5 @@
-
+Asura 4 with Cuda 
+<pre>
 # nvcc --compiler-options -fpermissive asura.cpp -ltbb  
 
 root@flare-Precision-Tower-7910:~/Asura/4# nvcc --version                                                                                
@@ -13,5 +14,6 @@ Copyright (C) 2017 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-root@flare-Precision-Tower-7910:~/Asura/4# uname -a                                                                                      
+root@flare-Precision-Tower-7910:~/Asura/4# uname -a
 Linux flare-Precision-Tower-7910 4.15.0-45-generic #48-Ubuntu SMP Tue Jan 29 16:28:13 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
+</pre>
