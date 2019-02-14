@@ -738,10 +738,12 @@ int main(int argc, char* argv[]) {
     /* first scatter */
     
     pthread_create(&master, NULL, (void*)master_func, (void*)&targ[0]);
+    // pthread_create(&master, NULL, master_func, *targ[0]);
     for (i = 1; i < thread_num; ++i)
       { 
         targ[i].id = i;
         pthread_create(&worker[i], NULL, (void*)worker_func, (void*)&targ[i]);
+	// pthread_create(&worker[i], NULL, worker_func, &targ[i]);
       }
     for (i = 1; i < thread_num; ++i) 
         pthread_join(worker[i], NULL);
@@ -752,7 +754,6 @@ int main(int argc, char* argv[]) {
     int counter = 0;
     for( CharTable::iterator i=table.begin(); i!=table.end(); ++i )
     {
-      // std::cout << i->first << "," << i->second << endl;
       outputfile << i->first << endl; // "," << i->second << endl;
       
       counter = counter + 1;
@@ -768,7 +769,6 @@ int main(int argc, char* argv[]) {
     counter = 0;
     for( CharTable2::iterator i=table2.begin(); i!=table2.end(); ++i )
     {
-      // std::cout << i->first << "," << i->second << endl;
       outputfile2 << i->first << "," << i->second << endl;
       
       counter = counter + 1;
@@ -789,21 +789,6 @@ int main(int argc, char* argv[]) {
     }
 
     outputfile3.close();
-  
-    // map<string, string> myAddrPair;
-
-    /*
-    pthread_mutex_lock(&result.mutex);
-    myAddrPair = addrpair.m;
-    pthread_mutex_unlock(&result.mutex);  
-
-    std::cout << "size:" << myAddrPair.size() << std::endl;
-    
-    for (auto itr = myAddrPair.begin(); itr != myAddrPair.end(); itr++)
-      {
-	std::cout << itr->first << "," << itr->second << std::endl;
-      }	
-    */	                                                       
-    
+      
     return 0;
 }
