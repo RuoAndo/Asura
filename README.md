@@ -1,9 +1,13 @@
-<img src="asura.png" width=200 height=200>
-PLAN: Cocurrent hash map (Intel TBB) is going to be adopted: 2018.10-2018.11
-
 Currently, Asura can process 76,835,550 packets in 200-400 minutes.
 
+<img src="asura.png" width=200 height=200>
+
+PLAN1: Cocurrent hash map (Intel TBB) is going to be adopted: 2018.10-2018.11
 2019.01.22: directory "1", "2" and "3" newly added which is going to be adopt concurrent hashmap (lock-free) of Intel TBB. 
+<br>
+PLAN2: NVidia Cuda Thrust is going to be adopted: 2019.02-2019.03
+2019.02.14: directory "4" newly added which is work with Cuda Thrust.
+
 <pre>
 1: stl wrapped by mutex
    pthread --- worker_func1
