@@ -56,7 +56,7 @@ using namespace std;
 using namespace tbb;
 
 
-#define N 3
+#define N 30
 #define WORKER_THREAD_NUM N
 #define MAX_QUEUE_NUM N
 #define END_MARK_FNAME   "///"
@@ -820,6 +820,20 @@ int main(int argc, char* argv[]) {
     outputfile2.close();
     */    
 
+    /* 
+    table3: total length
+    table2: counted
+
+    CharTable2::accessor a2;
+    table2.insert(a2, n);
+    a2->second = +tlen;     
+
+    CharTable3::accessor a3;
+    table3.insert(a3, n);
+    a3->second += 1;     
+    
+    */
+
     thrust::host_vector<unsigned long long> h_vec_1(table3.size());
     thrust::host_vector<int> h_vec_2(table3.size());
     
@@ -833,8 +847,9 @@ int main(int argc, char* argv[]) {
     {
       if(counter < 10)
 	std::cout << i->first << "," << i->second << endl;
-        
-      outputfile3 << i->first << "," << i->second << endl;
+
+      if((int)i->first > 0)
+	outputfile3 << i->first << "," << i->second << endl;
 
       h_vec_1[counter] = (unsigned long long)i->first;
       h_vec_2[counter] = (int)i->second;
@@ -855,7 +870,8 @@ int main(int argc, char* argv[]) {
     counter = 0;
     for( CharTable4::iterator i=table4.begin(); i!=table4.end(); ++i )
     {
-      outputfile4 << i->first << "," << i->second << endl;
+      if((int)i->first > 0)
+	outputfile4 << i->first << "," << i->second << endl;
       counter = counter + 1;
     }
 
