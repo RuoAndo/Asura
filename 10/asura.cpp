@@ -56,7 +56,7 @@ using namespace std;
 using namespace tbb;
 
 
-#define N 3
+#define N 10
 #define WORKER_THREAD_NUM N
 #define MAX_QUEUE_NUM N
 #define END_MARK_FNAME   "///"
@@ -837,7 +837,8 @@ int main(int argc, char* argv[]) {
 	else if (h_vec_4[i] > 0)
 	  tmp_div =  (double)h_vec_2[i] / (double)h_vec_4[i];
 	
-	outputfile3 << h_vec_1[i] << "," << h_vec_2[i] << "," << h_vec_3[i] << "," << h_vec_4[i] << "," << tmp_div << endl;
+	// outputfile3 << h_vec_1[i] << "," << h_vec_2[i] << "," << h_vec_3[i] << "," << h_vec_4[i] << "," << tmp_div << endl;
+	outputfile3 << h_vec_1[i] << "," << h_vec_2[i] << "," << h_vec_4[i] << endl;
       }
 
     outputfile3.close();
