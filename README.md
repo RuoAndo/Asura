@@ -35,6 +35,8 @@ PLAN2: NVidia Cuda Thrust is going to be adopted: 2019.02-2019.03
 
 7: concurrent hash map with hashcompare()
 8: concurrent hash map -> thrust::host_vector()
+11: concurrent hash map with hashcompare()
+
 </pre>
 
 # Quick test
