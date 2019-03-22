@@ -37,6 +37,12 @@
 #include <cctype>
 #include <iostream>
 
+#include "tbb/task_scheduler_init.h"
+#include "tbb/concurrent_hash_map.h"
+#include "tbb/blocked_range.h"
+#include "tbb/parallel_for.h"
+#include <tbb/concurrent_vector.h>
+
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
 #include <thrust/generate.h>
@@ -44,14 +50,7 @@
 #include <thrust/copy.h>
 #include <algorithm>
 #include <cstdlib>
-// #include "util.h"
 #include "timer.h" 
-
-#include "tbb/task_scheduler_init.h"
-#include "tbb/concurrent_hash_map.h"
-#include "tbb/blocked_range.h"
-#include "tbb/parallel_for.h"
-#include <tbb/concurrent_vector.h>
 
 using namespace std;
 using namespace tbb;
@@ -759,7 +758,7 @@ int main(int argc, char* argv[]) {
     pthread_t worker[thread_num];
     pthread_t worker2[thread_num];
     int cpu_num;
-
+    
     /*
     map<string, string> myAddrPair;
     int map_counter = 0;
@@ -796,27 +795,57 @@ int main(int argc, char* argv[]) {
         pthread_join(worker[i], NULL);
 
     int counter = 0;
-    
-    thrust::host_vector<unsigned long long> h_vec_1;
+        
+    tbb::concurrent_vector<unsigned long long>::iterator start;
+    tbb::concurrent_vector<unsigned long long>::iterator end = TbbVec.end();
 
-    /*
-    thrust::host_vector<int> h_vec_2;
-    thrust::host_vector<unsigned long long> h_vec_3;
-    thrust::host_vector<int> h_vec_4;
-    */
+    int kBytes = TbbVec.size() * sizeof(unsigned long long);
+    int vBytes = TbbVec.size() * sizeof(long);
+    
+    unsigned long long *k_in, *k_out;
+    long *v_in, *v_out;
+    k_in = (unsigned long long *)malloc(kBytes);
+    v_in = (long *)malloc(vBytes);
+
+    k_out = (unsigned long long *)malloc(kBytes);
+    v_out = (long *)malloc(vBytes);      
+
+    counter = 0;
+    for(start = TbbVec.begin();start != end;++start)
+      {
+	unsigned long long s = (unsigned long long)*start;
+	// key_in.push_back(s);
+	// value_in.push_back(1);
+	k_in[counter] = s;
+	v_in[counter] = 1;
+
+	counter = counter + 1;
+	// outputfile << *start << ",1" << endl;
+      }
+
+    thrust::sort(k_in, k_in + TbbVec.size());
+    
+    auto new_end = thrust::reduce_by_key(k_in,
+					 k_in + TbbVec.size(),
+					 v_in,
+					 k_out,
+					 v_out);
+
+    long new_size = new_end.first - k_out;
 
     std::remove("tmp-asura");
     ofstream outputfile("tmp-asura");
     
-    tbb::concurrent_vector<unsigned long long>::iterator start;
-    tbb::concurrent_vector<unsigned long long>::iterator end = TbbVec.end();
-
-    for(start = TbbVec.begin();start != end;++start)
+    counter = 0;
+    for(int i=0; i < new_size; i++)
       {
-	outputfile << *start << ",1" << endl;
-	// std::cout << *start << "\n";
+	// cout << k_out[counter] << "," <<  v_out[counter] << endl;
+	outputfile << k_out[counter] << "," <<  v_out[counter] << endl;
+	counter = counter + 1;
       }
 
+    outputfile.close();
+    
     /*
     std::remove("tmp3");
     ofstream outputfile3("tmp3");
