@@ -56,7 +56,7 @@ using namespace std;
 using namespace tbb;
 
 
-#define N 200
+#define N 26
 #define WORKER_THREAD_NUM N
 #define MAX_QUEUE_NUM N
 #define END_MARK_FNAME   "///"
@@ -66,7 +66,9 @@ using namespace tbb;
 
 /* srcIP, destIP */
 typedef struct _addrpair {
-  map<unsigned long long, long> m;
+  // map<unsigned long long, long> m;
+  vector<unsigned long long> pair;
+  vector<long> count;
   pthread_mutex_t mutex;
 } addrpair_t;
 addrpair_t addrpair;
@@ -401,7 +403,9 @@ int ProcIpHeader(struct iphdr *iphdr,u_char *option,int optionLen,FILE *fp,u_cha
   unsigned long long n = bitset<64>(IPstring).to_ullong();    
 
   pthread_mutex_lock(&addrpair.mutex);
-  addrpair.m.insert(pair<unsigned long long, long>(n,1));
+  // addrpair.m.insert(pair<unsigned long long, long>(n,1));
+  addrpair.pair.push_back(n);
+  addrpair.count.push_back(1);
   pthread_mutex_unlock(&addrpair.mutex); 
   
   /*
@@ -529,8 +533,7 @@ int traverse_file(char* filename, char* srchstr, int thread_id) {
 		  if(counter % DISP_FREQ == 0)
 		    printf("worker@1stPhase:threadID:%d:filename:%s IP 080045:counter:%d\n", thread_id, filename, counter);
 		  
-		  fseek(fp,-1.5L,SEEK_CUR);
-		  if (fgets(buf, sizeof(struct iphdr)+8, fp) != NULL)
+		  fseek(fp,-1.5L,SEEK_CUR);		  if (fgets(buf, sizeof(struct iphdr)+8, fp) != NULL)
 		    {
 		      ptr = buf;
 		      AnalyzeIp(ptr,sizeof(struct iphdr));
@@ -788,43 +791,69 @@ int main(int argc, char* argv[]) {
     int counter = 0;
     
     thrust::host_vector<unsigned long long> h_vec_1;
-    thrust::host_vector<int> h_vec_2;
+    thrust::host_vector<long> h_vec_2;
     
-    map<unsigned long long, long> myAddrPair;
-
+    // map<unsigned long long, long> myAddrPair;
+    vector<unsigned long long> myPair;
+    vector<long> myCount;
+    
     pthread_mutex_lock(&addrpair.mutex);
-    myAddrPair = addrpair.m;
+    myPair = addrpair.pair;
+    myCount = addrpair.count;
     pthread_mutex_unlock(&addrpair.mutex);   
 
-    map<unsigned long long, long>::iterator itr; 
-    
-    for (itr = myAddrPair.begin(); itr != myAddrPair.end(); itr++)
+    vector<unsigned long long>::iterator itr; 
+
+    std::remove("tmp-asura");
+    ofstream outputfile("tmp-asura");
+    counter = 0;
+    for (itr = myPair.begin(); itr != myPair.end(); itr++)
       {
-	  h_vec_1.push_back((unsigned long long)itr->first);
-	  h_vec_2.push_back((int)itr->second);
-           counter = counter + 1;
-    }
+	outputfile << myPair[counter] << "," << myCount[counter] << endl;
 
-    std::cout << "size:" << h_vec_1.size() << endl;
-    
-    std::remove("tmp3");
-    ofstream outputfile3("tmp3");
+	// h_vec_1.push_back(myPair[counter]);
+	// h_vec_2.push_back(myCount[counter]);
 
-    thrust::host_vector<unsigned long long> h_vec_3;
-    thrust::host_vector<int> h_vec_4;  
-    
-    thrust::sort_by_key(h_vec_1.begin(), h_vec_1.end(), h_vec_2.begin());
-    //thrust::sort_by_key(h_vec_3.begin(), h_vec_3.end(), h_vec_4.begin());
-
-    // thrust::device_vector<unsigned long long> key_in = h_vec_1;
-    // thrust::device_vector<int> value_in = h_vec_2;
-
-    for(int i = 0; i < h_vec_1.size(); i++)   
-      {
-	outputfile3 << h_vec_1[i] << "," << h_vec_2[i] << endl;
+	counter = counter + 1;
       }
+
+    outputfile.close();
+    
+    // std::cout << "size h_vec_1:" << h_vec_1.size() << endl;
+    // std::cout << "size h_vec_2:" << h_vec_2.size() << endl;
+        
+    // thrust::device_vector<unsigned long long> d_key_in = h_vec_1;
+    // thrust::device_vector<long> d_value_in = h_vec_2;
+
+    // thrust::device_vector<unsigned long long> d_key_out(d_key_in.size());
+    // thrust::device_vector<long> d_value_out;
+
+    // thrust::copy(h_vec_1.begin(), h_vec_1.end(), h_key_out.begin());
+    // thrust::copy(h_vec_2.begin(), h_vec_2.end(), h_value_out.begin());
+
+    /*
+    auto new_end = thrust::reduce_by_key(d_key_in.begin(),
+					 d_key_in.end(),
+					 d_value_in.begin(),
+					 d_key_out.begin(),
+	  				 d_value_out.begin());
+    */
+
+    /*
+    long new_size = new_end.first - h_key_out.begin();
+    cout << "new size:" << h_key_out.size() << "," << new_size << endl;
+
+    std::remove("tmp2");
+    ofstream outputfile3("tmp2");
+
+    for(int i=0;i<new_size;i++)
+     {
+	  outputfile3 << (unsigned long long)h_key_out[i] << "," << (long)h_value_out[i] << endl;
+	  cout << (unsigned long long)h_key_out[i] << "," << (long)h_value_out[i] << endl;
+     }
     
     outputfile3.close();
-    
+    */
+
     return 0;
 }
