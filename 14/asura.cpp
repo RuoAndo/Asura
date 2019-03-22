@@ -810,6 +810,9 @@ int main(int argc, char* argv[]) {
     k_out = (unsigned long long *)malloc(kBytes);
     v_out = (long *)malloc(vBytes);      
 
+    std::remove("tmp-asura");
+    ofstream outputfile("tmp-asura");
+    
     counter = 0;
     for(start = TbbVec.begin();start != end;++start)
       {
@@ -819,12 +822,17 @@ int main(int argc, char* argv[]) {
 	k_in[counter] = s;
 	v_in[counter] = 1;
 
+	outputfile << k_in[counter] << "," << v_in[counter];
+	
 	counter = counter + 1;
 	// outputfile << *start << ",1" << endl;
       }
 
+    outputfile.close();
+
+    /*
     thrust::sort(k_in, k_in + TbbVec.size());
-    
+
     auto new_end = thrust::reduce_by_key(k_in,
 					 k_in + TbbVec.size(),
 					 v_in,
@@ -832,20 +840,17 @@ int main(int argc, char* argv[]) {
 					 v_out);
 
     long new_size = new_end.first - k_out;
-
-    std::remove("tmp-asura");
-    ofstream outputfile("tmp-asura");
     
     counter = 0;
     for(int i=0; i < new_size; i++)
       {
-	// cout << k_out[counter] << "," <<  v_out[counter] << endl;
 	outputfile << k_out[counter] << "," <<  v_out[counter] << endl;
 	counter = counter + 1;
       }
 
     outputfile.close();
-    
+    */    
+
     /*
     std::remove("tmp3");
     ofstream outputfile3("tmp3");
