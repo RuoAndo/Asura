@@ -56,7 +56,7 @@ using namespace std;
 using namespace tbb;
 
 
-#define N 100
+#define N 200
 #define WORKER_THREAD_NUM N
 #define MAX_QUEUE_NUM N
 #define END_MARK_FNAME   "///"
@@ -789,15 +789,7 @@ int main(int argc, char* argv[]) {
     
     thrust::host_vector<unsigned long long> h_vec_1;
     thrust::host_vector<int> h_vec_2;
-
-    thrust::host_vector<unsigned long long> h_vec_3;
-    thrust::host_vector<int> h_vec_4;
     
-    std::cout << "table3:" << table3.size() << endl;
-
-    std::remove("tmp3");
-    ofstream outputfile3("tmp3");
-
     map<unsigned long long, long> myAddrPair;
 
     pthread_mutex_lock(&addrpair.mutex);
@@ -808,14 +800,30 @@ int main(int argc, char* argv[]) {
     
     for (itr = myAddrPair.begin(); itr != myAddrPair.end(); itr++)
       {
-	      if(counter < table3.size() && (int)itr->first > 0)
-	{
 	  h_vec_1.push_back((unsigned long long)itr->first);
 	  h_vec_2.push_back((int)itr->second);
-	}
-      counter = counter + 1;
+           counter = counter + 1;
     }
 
+    std::cout << "size:" << h_vec_1.size() << endl;
+    
+    std::remove("tmp3");
+    ofstream outputfile3("tmp3");
+
+    thrust::host_vector<unsigned long long> h_vec_3;
+    thrust::host_vector<int> h_vec_4;  
+    
+    thrust::sort_by_key(h_vec_1.begin(), h_vec_1.end(), h_vec_2.begin());
+    //thrust::sort_by_key(h_vec_3.begin(), h_vec_3.end(), h_vec_4.begin());
+
+    // thrust::device_vector<unsigned long long> key_in = h_vec_1;
+    // thrust::device_vector<int> value_in = h_vec_2;
+
+    for(int i = 0; i < h_vec_1.size(); i++)   
+      {
+	outputfile3 << h_vec_1[i] << "," << h_vec_2[i] << endl;
+      }
+    
     outputfile3.close();
     
     return 0;
