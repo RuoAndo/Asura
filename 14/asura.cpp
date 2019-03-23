@@ -822,7 +822,7 @@ int main(int argc, char* argv[]) {
 	k_in[counter] = s;
 	v_in[counter] = 1;
 
-	outputfile << k_in[counter] << "," << v_in[counter];
+	outputfile << k_in[counter] << "," << v_in[counter] << endl;
 	
 	counter = counter + 1;
 	// outputfile << *start << ",1" << endl;
