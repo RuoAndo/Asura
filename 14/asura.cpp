@@ -55,7 +55,7 @@
 using namespace std;
 using namespace tbb;
 
-#define N 100
+#define N 300
 #define WORKER_THREAD_NUM N
 #define MAX_QUEUE_NUM N
 #define END_MARK_FNAME   "///"
@@ -795,12 +795,11 @@ int main(int argc, char* argv[]) {
         pthread_join(worker[i], NULL);
 
     int counter = 0;
-        
-    tbb::concurrent_vector<unsigned long long>::iterator start;
-    tbb::concurrent_vector<unsigned long long>::iterator end = TbbVec.end();
 
-    int kBytes = TbbVec.size() * sizeof(unsigned long long);
-    int vBytes = TbbVec.size() * sizeof(long);
+    std::cout << TbbVec.size() << endl;
+    
+    long kBytes = TbbVec.size() * sizeof(unsigned long long);
+    long vBytes = TbbVec.size() * sizeof(long);
     
     unsigned long long *k_in, *k_out;
     long *v_in, *v_out;
@@ -812,6 +811,9 @@ int main(int argc, char* argv[]) {
 
     std::remove("tmp-asura");
     ofstream outputfile("tmp-asura");
+
+    tbb::concurrent_vector<unsigned long long>::iterator start;
+    tbb::concurrent_vector<unsigned long long>::iterator end = TbbVec.end();
     
     counter = 0;
     for(start = TbbVec.begin();start != end;++start)
