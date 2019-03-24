@@ -796,7 +796,7 @@ int main(int argc, char* argv[]) {
 
     int counter = 0;
 
-    std::cout << TbbVec.size() << endl;
+    std::cout << "tbbvec size:" << TbbVec.size() << endl;
     
     long long kBytes = TbbVec.size() * sizeof(unsigned long long);
     long long vBytes = TbbVec.size() * sizeof(long);
@@ -809,54 +809,87 @@ int main(int argc, char* argv[]) {
     k_out = (unsigned long long *)malloc(kBytes);
     v_out = (long *)malloc(vBytes);      
 
-    std::remove("tmp-asura");
-    ofstream outputfile("tmp-asura");
-
     tbb::concurrent_vector<unsigned long long>::iterator start;
     tbb::concurrent_vector<unsigned long long>::iterator end = TbbVec.end();
-    
-    counter = 0;
-    for(start = TbbVec.begin();start != end;++start)
-      {
-	unsigned long long s = (unsigned long long)*start;
-	// key_in.push_back(s);
-	// value_in.push_back(1);
-	k_in[counter] = s;
-	v_in[counter] = 1;
 
-	outputfile << k_in[counter] << "," << v_in[counter] << endl;
+    int INTVL = 100000000;
+    int DIV = TbbVec.size() / INTVL;
+    int MOD = TbbVec.size() % INTVL;
+
+    thrust::host_vector<unsigned long long> h_vec_1;
+    thrust::host_vector<long> h_vec_2;
+
+    counter = 0;
+    for(int i = 0; i < DIV; i++)
+      {
+
+	cout << "reducing stage " << i << "..." << endl;
 	
+	for(int j = 0; j < INTVL; j++)
+	  {
+	    // unsigned long long s = (unsigned long long)*start;
+
+	    k_in[j] = TbbVec[counter];
+	    v_in[j] = 1;
+	    
+	    counter = counter + 1;
+	  }
+	    
+	thrust::sort(k_in, k_in + INTVL);
+
+	auto new_end = thrust::reduce_by_key(k_in,
+					     k_in + INTVL,
+					     v_in,
+					     k_out,
+					     v_out);
+	    
+	long new_size = new_end.first - k_out;
+    
+	for(int i=0; i < new_size; i++)
+	  {
+	    h_vec_1.push_back(k_out[i]);
+	    h_vec_2.push_back(v_out[i]);
+	  }
+
+      } // for(int i = 0; i < DIV; i++)
+
+    // MOD -- rest of DIV
+    
+    for(int j = 0; j < MOD; j++)
+      {
+	k_in[j] = TbbVec[counter];
+	v_in[j] = 1;
+	    
 	counter = counter + 1;
-	// outputfile << *start << ",1" << endl;
       }
 
-    outputfile.close();
-
-    /*
-    thrust::sort(k_in, k_in + TbbVec.size());
+    thrust::sort(k_in, k_in + INTVL);
 
     auto new_end = thrust::reduce_by_key(k_in,
-					 k_in + TbbVec.size(),
+					 k_in + MOD,
 					 v_in,
 					 k_out,
 					 v_out);
-
+	    
     long new_size = new_end.first - k_out;
     
-    counter = 0;
-    for(int i=0; i < new_size; i++)
+    for(int i = 0; i < new_size; i++)
       {
-	outputfile << k_out[counter] << "," <<  v_out[counter] << endl;
-	counter = counter + 1;
+	h_vec_1.push_back(k_out[i]);
+	h_vec_2.push_back(v_out[i]);
+      }
+    
+    cout << "reduced size:" << h_vec_1.size() << endl;
+
+    std::remove("tmp-asura");
+    ofstream outputfile("tmp-asura");
+    
+    for(int i = 0; i < h_vec_1.size(); i++)
+      {
+	std::cout << h_vec_1[i] << "," << h_vec_2[i] << endl;
       }
 
     outputfile.close();
-    */    
-
-    /*
-    std::remove("tmp3");
-    ofstream outputfile3("tmp3");
-    */
 
     return 0;
 }
