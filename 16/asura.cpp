@@ -809,7 +809,7 @@ int main(int argc, char* argv[]) {
     tbb::concurrent_vector<unsigned long long>::iterator end = TbbVec.end();
     */
 
-    int INTVL = 1000000;
+    int INTVL = 300000000;
     int DIV = TbbVec1.size() / INTVL;
     int MOD = TbbVec1.size() % INTVL;
 
