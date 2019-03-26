@@ -153,7 +153,29 @@ int main( int argc, char* argv[] ) {
 
 	  for(long i=0; i <new_size; i++)
 	  {
-	    outputfile << hkey_out_2[i] << "," << hvalue_out_2[i] << endl;
+	    // outputfile << hkey_out_2[i] << "," << hvalue_out_2[i] << endl;
+
+            bitset<64> addr((unsigned long long)hkey_out_2[i]);
+            std::string addr_string = addr.to_string();
+            // cout << addr_string.substr(0,31) << "," << addr_string.substr(32,63) << "," << hvalue_out_2[i] << endl;
+            string addr_src = addr_string.substr(0,32);
+            string addr_dst = addr_string.substr(32,32);
+
+            bitset<32> bs(addr_src);
+            bitset<32> ds(addr_dst);
+            unsigned long long int s = bs.to_ullong();
+            unsigned long long int d = ds.to_ullong();
+
+            inaddr = { htonl(s) };
+            some_addr = inet_ntoa(inaddr);
+            string src_string = string(some_addr);   
+
+            inaddr = { htonl(d) };
+            some_addr = inet_ntoa(inaddr);
+            string dst_string = string(some_addr);
+
+            outputfile << src_string << "," << dst_string << "," << hvalue_out_2[i] << endl; 
+
           }
 
 	  /*
