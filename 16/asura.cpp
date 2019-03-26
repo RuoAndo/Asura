@@ -813,12 +813,20 @@ int main(int argc, char* argv[]) {
     int DIV = TbbVec1.size() / INTVL;
     int MOD = TbbVec1.size() % INTVL;
 
-    thrust::host_vector<unsigned long long> h_vec_1;
-    thrust::host_vector<long> h_vec_2;
+    /*
+      thrust::host_vector<unsigned long long> h_vec_1;
+      thrust::host_vector<long> h_vec_2;
 
-    thrust::host_vector<unsigned long long> h_vec_3;
-    thrust::host_vector<long> h_vec_4;
+      thrust::host_vector<unsigned long long> h_vec_3;
+      thrust::host_vector<long> h_vec_4;
+    */
 
+    std::vector<unsigned long long> h_vec_1;
+    std::vector<long> h_vec_2;
+
+    std::vector<unsigned long long> h_vec_3;
+    std::vector<long> h_vec_4; 
+        
     counter = 0;
     int counter2 = 0;
     
