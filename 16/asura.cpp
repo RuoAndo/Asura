@@ -833,7 +833,7 @@ int main(int argc, char* argv[]) {
     for(int i = 0; i < DIV; i++)
       {
 
-	cout << "reducing stage " << i << " " << INTVAL << "..." << endl;
+	cout << "reducing stage " << i << " " << INTVL << "..." << endl;
 
 	/* 1 */
 
