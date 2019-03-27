@@ -1005,7 +1005,8 @@ int main(int argc, char* argv[]) {
 
     for(int i = 0; i < h_vec_1.size(); i++)
       {
-	std::cout << h_vec_1[i] << "," << h_vec_2[i] << "," << h_vec_3[i] << "," << h_vec_4[i] << endl;
+	// outputfile << h_vec_1[i] << "," << h_vec_2[i] << "," << h_vec_3[i] << "," << h_vec_4[i] << endl;
+	outputfile << h_vec_1[i] << "," << h_vec_2[i] << "," << h_vec_4[i] << endl;
       }
 
     travdirtime = stop_timer(&t);
