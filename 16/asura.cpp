@@ -809,7 +809,7 @@ int main(int argc, char* argv[]) {
     tbb::concurrent_vector<unsigned long long>::iterator end = TbbVec.end();
     */
 
-    int INTVL = 300000000;
+    int INTVL = 200000000;
     int DIV = TbbVec1.size() / INTVL;
     int MOD = TbbVec1.size() % INTVL;
 
@@ -833,9 +833,13 @@ int main(int argc, char* argv[]) {
     for(int i = 0; i < DIV; i++)
       {
 
-	cout << "reducing stage " << i << "..." << endl;
+	cout << "reducing stage " << i << " " << INTVAL << "..." << endl;
 
 	/* 1 */
+
+	cout << "storing from Tbb to array..." << endl;
+        start_timer(&t);
+	
 	for(int j = 0; j < INTVL; j++)
 	  {
 	    k_in[j] = TbbVec1[counter];
@@ -843,7 +847,13 @@ int main(int argc, char* argv[]) {
 	    
 	    counter = counter + 1;
 	  }
-	    
+	
+	travdirtime = stop_timer(&t);
+	print_timer(travdirtime);  
+
+	cout << "sorting and reduction..." << endl;
+        start_timer(&t);
+	
 	thrust::sort(k_in, k_in + INTVL);
 
 	auto new_end = thrust::reduce_by_key(k_in,
@@ -853,14 +863,27 @@ int main(int argc, char* argv[]) {
 					     v_out);
 	    
 	long new_size = new_end.first - k_out;
-    
+
+	travdirtime = stop_timer(&t);
+	print_timer(travdirtime);  
+
+	cout << "push_back..." << endl;
+        start_timer(&t);
+	
 	for(int i=0; i < new_size; i++)
 	  {
 	    h_vec_1.push_back(k_out[i]);
 	    h_vec_2.push_back(v_out[i]);
 	  }
 
+	travdirtime = stop_timer(&t);
+	print_timer(travdirtime);  
+	
 	/* 2 */
+
+	cout << "storing from Tbb to array..." << endl;
+        start_timer(&t);
+	
 	for(int j = 0; j < INTVL; j++)
 	  {
 	    k_in[j] = TbbVec1[counter2];
@@ -868,7 +891,13 @@ int main(int argc, char* argv[]) {
 	    
 	    counter2 = counter2 + 1;
 	  }
-	    
+
+	travdirtime = stop_timer(&t);
+	print_timer(travdirtime);  
+
+	cout << "sorting and reduction..." << endl;
+        start_timer(&t);
+	
 	thrust::sort(k_in, k_in + INTVL);
 
 	auto new_end2 = thrust::reduce_by_key(k_in,
@@ -876,15 +905,26 @@ int main(int argc, char* argv[]) {
 					     v_in,
 					     k_out,
 					     v_out);
-	    
+
+	travdirtime = stop_timer(&t);
+	print_timer(travdirtime);  
+	
 	long new_size2 = new_end2.first - k_out;
-    
+
+	cout << "push_back..." << endl;
+        start_timer(&t);
+	
 	for(int i=0; i < new_size2; i++)
 	  {
 	    h_vec_3.push_back(k_out[i]);
 	    h_vec_4.push_back(v_out[i]);
 	  }
 
+	travdirtime = stop_timer(&t);
+	print_timer(travdirtime);  
+	
+        cudaDeviceReset();
+	
       } // for(int i = 0; i < DIV; i++)
 
     cout << "reduced size:" << h_vec_1.size() << ":" << counter << endl;
