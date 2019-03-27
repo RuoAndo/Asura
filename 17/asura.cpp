@@ -117,7 +117,7 @@ static CharTable4 table4;
 
 typedef tbb::concurrent_vector<unsigned long long> iTbb_Vec1;
 iTbb_Vec1 TbbVec1;
-typedef tbb::concurrent_vector<unsigned long long> iTbb_Vec2;
+typedef tbb::concurrent_vector<long> iTbb_Vec2;
 iTbb_Vec2 TbbVec2;
 
 /* reduced */
@@ -799,7 +799,8 @@ int main(int argc, char* argv[]) {
 
     int counter = 0;
 
-    std::cout << TbbVec1.size() << endl;
+    std::cout << "TbbVec1 size:" << TbbVec1.size() << endl;
+    std::cout << "TbbVec2 size:" << TbbVec2.size() << endl;
     
     std::remove("tmp-asura-1");
     ofstream outputfile1("tmp-asura-1");
@@ -807,18 +808,28 @@ int main(int argc, char* argv[]) {
     std::remove("tmp-asura-2");
     ofstream outputfile2("tmp-asura-2");
 
-    tbb::concurrent_vector<unsigned long long>::iterator start;
-    tbb::concurrent_vector<unsigned long long>::iterator end = TbbVec1.end();
-    
-    counter = 0;
-    for(start = TbbVec1.begin();start != end;++start)
-      {
-	unsigned long long s = (unsigned long long)*start;
+    tbb::concurrent_vector<unsigned long long>::iterator start1;
+    tbb::concurrent_vector<unsigned long long>::iterator end1 = TbbVec1.end();
 
-	outputfile1 << TbbVec1[counter] << "," << "1" << endl;
-	outputfile2 << TbbVec1[counter] << "," << TbbVec2[counter] << endl;
+    tbb::concurrent_vector<long>::iterator start2;
+    tbb::concurrent_vector<long>::iterator end2 = TbbVec2.end();
+    
+    // counter = 0;
+    
+    for(start1 = TbbVec1.begin();start1 != end1;++start1)
+      {
+	unsigned long long s = (unsigned long long)*start1;
+	outputfile1 << s << "," << "1" << endl;
+      }
+
+    start2 = TbbVec2.begin();
+    for(start1 = TbbVec1.begin();start1 != end1;++start1)
+      {
+	unsigned long long s = (unsigned long long)*start1;
+	long t = (unsigned long long)*start2;
 	
-	counter = counter + 1;
+	outputfile2 << s << "," << t << endl;
+	start2++;
       }
 
     outputfile1.close();
