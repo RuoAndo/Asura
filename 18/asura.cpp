@@ -795,28 +795,10 @@ int main(int argc, char* argv[]) {
     
     unsigned long long *k_in, *k_out;
     long *v_in, *v_out;
-    k_in = (unsigned long long *)malloc(kBytes);
-    v_in = (long *)malloc(vBytes);
 
-    k_out = (unsigned long long *)malloc(kBytes);
-    v_out = (long *)malloc(vBytes);      
-
-    /*
-    tbb::concurrent_vector<unsigned long long>::iterator start;
-    tbb::concurrent_vector<unsigned long long>::iterator end = TbbVec.end();
-    */
-
-    int INTVL = 400000000;
+    int INTVL = 200000000;
     int DIV = TbbVec1.size() / INTVL;
     int MOD = TbbVec1.size() % INTVL;
-
-    /*
-      thrust::host_vector<unsigned long long> h_vec_1;
-      thrust::host_vector<long> h_vec_2;
-
-      thrust::host_vector<unsigned long long> h_vec_3;
-      thrust::host_vector<long> h_vec_4;
-    */
 
     std::vector<unsigned long long> h_vec_1;
     std::vector<long> h_vec_2;
@@ -829,7 +811,12 @@ int main(int argc, char* argv[]) {
     
     for(int i = 0; i < DIV; i++)
       {
+	k_in = (unsigned long long *)malloc(kBytes);
+	v_in = (long *)malloc(vBytes);
 
+	k_out = (unsigned long long *)malloc(kBytes);
+	v_out = (long *)malloc(vBytes);      
+	
 	cout << "reducing stage " << i << " " << INTVL << "..." << endl;
 
 	/* 1 */
@@ -931,7 +918,13 @@ int main(int argc, char* argv[]) {
 
 	travdirtime = stop_timer(&t);
 	print_timer(travdirtime);  
-	
+
+	free(k_in);
+	free(v_in);
+
+	free(k_out);
+	free(v_out);
+
         cudaDeviceReset();
 	
       } // for(int i = 0; i < DIV; i++)
@@ -943,6 +936,12 @@ int main(int argc, char* argv[]) {
 
     cout << "MOD1..." << endl;
     start_timer(&t);
+
+    k_in = (unsigned long long *)malloc(kBytes);
+    v_in = (long *)malloc(vBytes);
+
+    k_out = (unsigned long long *)malloc(kBytes);
+    v_out = (long *)malloc(vBytes);      
     
     /* MOD1 */
 
@@ -977,14 +976,26 @@ int main(int argc, char* argv[]) {
 	h_vec_2.push_back(v_out[i]);
       }
 
+    free(k_in);
+    free(v_in);
+
+    free(k_out);
+    free(v_out);
+    
     travdirtime = stop_timer(&t);
     print_timer(travdirtime);  
-
+    
     cout << "MOD2..." << endl;
     start_timer(&t);
     
     /* MOD2 */
 
+    k_in = (unsigned long long *)malloc(kBytes);
+    v_in = (long *)malloc(vBytes);
+
+    k_out = (unsigned long long *)malloc(kBytes);
+    v_out = (long *)malloc(vBytes);      
+    
     for(int j = 0; j < MOD; j++)
       {
 	k_in[j] = 0;
@@ -1034,6 +1045,12 @@ int main(int argc, char* argv[]) {
 	// outputfile << h_vec_1[i] << "," << h_vec_2[i] << "," << h_vec_3[i] << "," << h_vec_4[i] << endl;
 	outputfile << h_vec_1[i] << "," << h_vec_2[i] << "," << h_vec_4[i] << endl;
       }
+
+    free(k_in); 
+    free(v_in); 
+
+    free(k_out);
+    free(v_out);
 
     travdirtime = stop_timer(&t);
     print_timer(travdirtime);  
