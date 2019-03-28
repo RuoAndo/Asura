@@ -806,7 +806,7 @@ int main(int argc, char* argv[]) {
     tbb::concurrent_vector<unsigned long long>::iterator end = TbbVec.end();
     */
 
-    int INTVL = 200000000;
+    int INTVL = 400000000;
     int DIV = TbbVec1.size() / INTVL;
     int MOD = TbbVec1.size() % INTVL;
 
@@ -836,7 +836,13 @@ int main(int argc, char* argv[]) {
 
 	cout << "storing from Tbb to array..." << endl;
         start_timer(&t);
-	
+
+	for(int j = 0; j < INTVL; j++)
+	  {
+	    k_in[j] = 0;
+	    v_in[j] = 0;
+	  }
+	    
 	for(int j = 0; j < INTVL; j++)
 	  {
 	    k_in[j] = TbbVec1[counter];
@@ -880,6 +886,12 @@ int main(int argc, char* argv[]) {
 
 	cout << "storing from Tbb to array..." << endl;
         start_timer(&t);
+
+	for(int j = 0; j < INTVL; j++)
+	  {
+	    k_in[j] = 0;
+	    v_in[j] = 0;
+	  }
 	
 	for(int j = 0; j < INTVL; j++)
 	  {
@@ -933,6 +945,13 @@ int main(int argc, char* argv[]) {
     start_timer(&t);
     
     /* MOD1 */
+
+    for(int j = 0; j < MOD; j++)
+      {
+	k_in[j] = 0;
+	v_in[j] = 0;
+      }
+    
     for(int j = 0; j < MOD; j++)
       {
 	k_in[j] = TbbVec1[counter];
@@ -965,6 +984,13 @@ int main(int argc, char* argv[]) {
     start_timer(&t);
     
     /* MOD2 */
+
+    for(int j = 0; j < MOD; j++)
+      {
+	k_in[j] = 0;
+	v_in[j] = 0;
+      }
+    
     for(int j = 0; j < MOD; j++)
       {
 	// k_in[j] = TbbVec1[counter2];
