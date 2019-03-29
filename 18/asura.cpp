@@ -789,9 +789,10 @@ int main(int argc, char* argv[]) {
 
     std::cout << "tbbvec1 size:" << TbbVec1.size() << endl;
     std::cout << "tbbvec2 size:" << TbbVec2.size() << endl;
-    
-    long long kBytes = TbbVec1.size() * sizeof(unsigned long long);
-    long long vBytes = TbbVec1.size() * sizeof(long);
+
+    // unsigned long 4 32bit 4294967295
+    unsigned long long kBytes = TbbVec1.size() * sizeof(unsigned long long);
+    unsigned long long vBytes = TbbVec1.size() * sizeof(long);
     
     unsigned long long *k_in, *k_out;
     long *v_in, *v_out;
