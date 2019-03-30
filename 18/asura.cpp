@@ -785,7 +785,9 @@ int main(int argc, char* argv[]) {
     for (i = 1; i < thread_num; ++i) 
         pthread_join(worker[i], NULL);
 
-    int counter = 0;
+    /* should be large than 200000000 */
+    unsigned long long counter;
+    unsigned long long counter2;
 
     std::cout << "tbbvec1 size:" << TbbVec1.size() << endl;
     std::cout << "tbbvec2 size:" << TbbVec2.size() << endl;
@@ -808,7 +810,7 @@ int main(int argc, char* argv[]) {
     std::vector<long> h_vec_4; 
         
     counter = 0;
-    int counter2 = 0;
+    counter2 = 0;
     
     for(int i = 0; i < DIV; i++)
       {
