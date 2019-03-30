@@ -10,33 +10,15 @@ PLAN2: NVidia Cuda Thrust is going to be adopted: 2019.02-2019.03
 
 <pre>
 1: stl wrapped by mutex
-   pthread --- worker_func1
-		|
-		|--- traverse_file1
-			|
-			|--- analyseIP
-				|
-				|--- ProcIPHeader
-
 2: hash table by Intel TBB
-
 3: stl wrapped by mutex
-   pthread ---- worker_func1
-	    |	|
-	    |	|--- traverse_file1
-	    |		|
-            |		|--- analyseIP
-	    |			|
-	    |			|--- ProcIPHeader
-            |
-	    |-- worker_func2
-	        |
-		|--- ...
-
 7: concurrent hash map with hashcompare()
 8: concurrent hash map -> thrust::host_vector()
 11: concurrent hash map with hashcompare()
-
+14: concurrent vector without hashcompare()
+17: concurrent vector without hashcompare() writing files
+18:
+19:
 </pre>
 
 # Quick test
