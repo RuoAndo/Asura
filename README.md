@@ -20,6 +20,7 @@ PLAN2: NVidia Cuda Thrust is going to be adopted: 2019.02-2019.03
 17: concurrent vector without hashcompare() writing files
 18:
 19:
+20: thrust without vector
 </pre>
 
 # Quick test
