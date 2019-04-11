@@ -33,9 +33,6 @@ squared_l2_distance_h(float x_1, float y_1, float x_2, float y_2) {
   return (x_1 - x_2) * (x_1 - x_2) + (y_1 - y_2) * (y_1 - y_2);
 }
 
-// In the assignment step, each point (thread) computes its distance to each
-// cluster centroid and adds its x and y values to the sum of its closest
-// centroid, as well as incrementing that centroid's count of assigned points.
 __global__ void assign_clusters(const thrust::device_ptr<float> data_x,
                                 const thrust::device_ptr<float> data_y,
                                 int data_size,
@@ -73,8 +70,6 @@ __global__ void assign_clusters(const thrust::device_ptr<float> data_x,
   atomicAdd(thrust::raw_pointer_cast(counts + best_cluster), 1);
 }
 
-// Each thread is one cluster, which just recomputes its coordinates as the mean
-// of all points assigned to it.
 __global__ void compute_new_means(thrust::device_ptr<float> means_x,
                                   thrust::device_ptr<float> means_y,
                                   const thrust::device_ptr<float> new_sum_x,
@@ -249,9 +244,20 @@ int main(int argc, const char* argv[])
   std::remove("clustered");
   ofstream outputfile("clustered");  
 
+  int sum;
+  float percent[3];
+  
+  for (size_t cluster = 0; cluster < k; ++cluster) {
+    sum = sum + h_counts[cluster];
+  }
+
+  for (size_t cluster = 0; cluster < k; ++cluster) {
+    percent[cluster] = (float)h_counts[cluster] / (float)sum;
+  }
+
   for(int i=0; i < N; i++)
   {
-	outputfile << h_src[i] << "," << h_dst[i] << "," << h_x[i] << "," << h_y[i] << ", cluster" << h_clusterNo[i] << std::endl;
+	outputfile << h_src[i] << "," << h_dst[i] << "," << h_x[i] << "," << h_y[i] << ", cluster" << h_clusterNo[i] << ",(" << percent[h_clusterNo[i]] << "%)" << std::endl;
   }
 
   outputfile.close();
