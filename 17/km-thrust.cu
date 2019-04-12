@@ -109,7 +109,7 @@ int main(int argc, const char* argv[])
 {
   int N = atoi(argv[3]);
   
-  int k = 3;
+  int k = 10;
   int number_of_iterations = 1000;
   int counter = 0;
 
@@ -245,7 +245,13 @@ int main(int argc, const char* argv[])
   ofstream outputfile("clustered");  
 
   int sum;
-  float percent[3];
+
+  int nBytes = k * sizeof(float);
+
+  float *percent;
+  percent = (float *)malloc(nBytes);
+
+
   
   for (size_t cluster = 0; cluster < k; ++cluster) {
     sum = sum + h_counts[cluster];
