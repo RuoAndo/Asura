@@ -10,7 +10,7 @@ PLAN2: NVidia Cuda Thrust is going to be adopted: 2019.02-2019.03
 2019.02.14: directory "4" newly added which is work with Cuda Thrust.
 
 <pre>
-0:
+0: original - DEFCON 26
 1: stl wrapped by mutex
 2: hash table by Intel TBB
 3: stl wrapped by mutex
@@ -33,3 +33,6 @@ PLAN2: NVidia Cuda Thrust is going to be adopted: 2019.02-2019.03
 20: thrust without vector
 </pre>
 
+<img src="asura2.jreg" width=200 height=200>
+
+2019.04: Asura 0 is released (DEFCON 26)
