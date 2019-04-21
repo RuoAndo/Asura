@@ -33,6 +33,6 @@ PLAN2: NVidia Cuda Thrust is going to be adopted: 2019.02-2019.03
 20: thrust without vector
 </pre>
 
-<img src="asura2.jreg" width=200 height=200>
+<img src="asura0.jpeg" width=200 height=200>
 
 2019.04: Asura 0 is released (DEFCON 26)
