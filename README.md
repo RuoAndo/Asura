@@ -2,6 +2,8 @@
 
 <img src="asura0.jpeg" width=200 height=200>
 
+Asura 1-18
+
 2018.08 Currently, Asura can process 76,835,550 packets in 200-400 minutes.<br>
 2019.03 Currently, Asura can process 3,959,137,279 packets in 851m24.777s.
 
