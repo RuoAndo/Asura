@@ -8,7 +8,9 @@
 #include <dirent.h>
 #include <pthread.h>
 #include <alloca.h>
+
 #include "timer.h"
+#include "kmeans.h"
 
 #include <regex.h>
 
@@ -31,10 +33,27 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <bitset>
+
+#include <cstdio>
+#include <cctype>
+#include <iostream>
+
+#include <algorithm>
+#include <cstdlib>
+// #include "util.h"
+#include "timer.h" 
+
+#include "tbb/task_scheduler_init.h"
+#include "tbb/concurrent_hash_map.h"
+#include "tbb/blocked_range.h"
+#include "tbb/parallel_for.h"
 
 using namespace std;
+using namespace tbb;
 
-#define N 2
+
+#define N 1000
 #define WORKER_THREAD_NUM N
 #define MAX_QUEUE_NUM N
 #define END_MARK_FNAME   "///"
@@ -48,6 +67,41 @@ typedef struct _addrpair {
   pthread_mutex_t mutex;
 } addrpair_t;
 addrpair_t addrpair;
+
+/*
+struct HashCompare {
+  static size_t hash( std::string x ) {
+    return (size_t)x.c_str();
+    }
+  static bool equal( std::string x, std::string y ) {
+        return x==y;
+    }
+};
+*/
+
+struct HashCompare {
+  static size_t hash( unsigned long long x ) {
+    return (size_t)x;
+    }
+  static bool equal( unsigned long long x, unsigned long long y ) {
+        return x==y;
+    }
+};
+
+// typedef concurrent_hash_map<std::string, std::string, HashCompare> CharTable;
+// typedef concurrent_hash_map<std::string, int, HashCompare> CharTable;
+
+typedef concurrent_hash_map<std::string, std::string> CharTable;
+static CharTable table;
+
+typedef concurrent_hash_map<unsigned long long, int, HashCompare> CharTable2;
+static CharTable2 table2;
+
+typedef concurrent_hash_map<unsigned long long, int, HashCompare> CharTable3;
+static CharTable3 table3;
+
+typedef concurrent_hash_map<unsigned long long, long, HashCompare> CharTable4;
+static CharTable4 table4;
 
 /* reduced */
 typedef struct _reduced {
@@ -259,7 +313,29 @@ char *ip_ip2str(u_int32_t ip,char *buf,socklen_t size)
   return(buf);
 }
 
-int ProcIpHeader(struct iphdr *iphdr,u_char *option,int optionLen,FILE *fp)
+std::vector<std::string> split_string_2(std::string str, char del) {
+  int first = 0;
+  int last = str.find_first_of(del);
+
+  std::vector<std::string> result;
+
+  while (first < str.size()) {
+    std::string subStr(str, first, last - first);
+
+    result.push_back(subStr);
+
+    first = last + 1;
+    last = str.find_first_of(del, first);
+
+    if (last == std::string::npos) {
+      last = str.size();
+    }
+  }
+
+  return result;
+}
+
+int ProcIpHeader(struct iphdr *iphdr,u_char *option,int optionLen,FILE *fp,u_char*ptr)
 {
   int i;
   char buf[80];
@@ -270,23 +346,85 @@ int ProcIpHeader(struct iphdr *iphdr,u_char *option,int optionLen,FILE *fp)
   string saddr;
   string daddr;
 
+  int tlen;
+
+  struct tcphdr *tcp;
+  struct udphdr *udp;
+
+  // u_char*ptr;
+  // ptr = iphadr;
+  
   /*
   fprintf(fp,"protocol=%u, ",iphdr->protocol);
   fprintf(fp,"saddr=%s,",ip_ip2str(iphdr->saddr,buf,sizeof(buf)));
   fprintf(fp,"daddr=%s\n",ip_ip2str(iphdr->daddr,buf,sizeof(buf)));
   fprintf(fp,"length=%u\n",ntohs(iphdr->tot_len));
-  */
+ */
 
   sprintf(src, ip_ip2str(iphdr->saddr,buf,sizeof(buf)));
   sprintf(dst, ip_ip2str(iphdr->daddr,buf,sizeof(buf)));
 
+  tlen = (signed int)ntohs(iphdr->tot_len);
+  
   saddr = string(src);
   daddr = string(dst);
 
-  pthread_mutex_lock(&addrpair.mutex);
-  addrpair.m.insert(pair<string, string>(saddr,daddr));
-  pthread_mutex_unlock(&addrpair.mutex); 
+  int sport = 0;
+  int dport = 0;
+  
+  char del = '.';
 
+  std::string stringIP;
+  std::string IPstring;
+	    	    
+  stringIP = saddr;	    
+  for (const auto subStr : split_string_2(stringIP, del)) {
+    unsigned long ipaddr_src;
+    ipaddr_src = atoi(subStr.c_str());
+    std::bitset<8> trans =  std::bitset<8>(ipaddr_src);
+    std::string trans_string = trans.to_string();
+    IPstring = IPstring + trans_string;
+  }
+	    
+  stringIP = daddr;
+  for (const auto subStr : split_string_2(stringIP, del)) {
+    unsigned long ipaddr_src;
+    ipaddr_src = atoi(subStr.c_str());
+    std::bitset<8> trans =  std::bitset<8>(ipaddr_src);
+    std::string trans_string = trans.to_string();
+    IPstring = IPstring + trans_string;
+  }
+	  
+  // CharTable::accessor a;
+  // table.insert(a, saddr);
+  // table.insert(a, IPstring);
+  // table.insert(a, n);
+  // a->second = daddr;
+  // a->second += 1;
+
+  unsigned long long n = bitset<64>(IPstring).to_ullong();    
+  
+  CharTable2::accessor a2;
+  table2.insert(a2, n);
+  a2->second = +tlen;     
+
+  CharTable3::accessor a3;
+  table3.insert(a3, n);
+  a3->second += 1;     
+
+  if(iphdr->protocol == IPPROTO_TCP)
+    {
+      tcp = (struct tcphdr *) ptr;
+      ptr += ((int) (tcp->th_off) << 2);   
+
+      sport = ntohs(tcp->th_sport);
+      dport = ntohs(tcp->th_dport);
+      
+      CharTable4::accessor a4;
+      table4.insert(a4, n);
+      a4->second += sport;     
+    }
+  
   return(0);
 }
 
@@ -325,12 +463,10 @@ int AnalyzeIp(u_char *data,int size)
   }
 
   if(checkIPchecksum(iphdr,option,optionLen)==0){
-    // fprintf(stderr,"bad ip checksum(%d) \n", chksum);
     chksum++;
-    //return(-1);
   }
   
-  ProcIpHeader(iphdr,option,optionLen,stdout);
+  ProcIpHeader(iphdr,option,optionLen,stdout,ptr);
   
   return(0);
 }
@@ -387,7 +523,7 @@ int traverse_file(char* filename, char* srchstr, int thread_id) {
 		{
 		  //if(thread_id % WORKER_THREAD_NUM == 0)
 		  if(counter % DISP_FREQ == 0)
-		    printf("worker1:threadID:%d:filename:%s IP 080045:counter:%d\n", thread_id, filename, counter);
+		    printf("worker@1stPhase:threadID:%d:filename:%s IP 080045:counter:%d\n", thread_id, filename, counter);
 		  
 		  fseek(fp,-1.5L,SEEK_CUR);
 		  if (fgets(buf, sizeof(struct iphdr)+8, fp) != NULL)
@@ -610,11 +746,13 @@ int main(int argc, char* argv[]) {
     pthread_t worker2[thread_num];
     int cpu_num;
 
+    /*
     map<string, string> myAddrPair;
     int map_counter = 0;
-    
+    */    
+
     if (argc != 2) {
-        printf("Usage: ./traverse7 [DIR] \n"); return 0;
+        printf("Usage: ./asura [DIR] \n"); return 0;
     }
     cpu_num = sysconf(_SC_NPROCESSORS_CONF);
 
@@ -642,6 +780,140 @@ int main(int argc, char* argv[]) {
       }
     for (i = 1; i < thread_num; ++i) 
         pthread_join(worker[i], NULL);
+
+    int counter = 0;
+    std::cout << "table3:" << table3.size() << endl;
+
+    std::remove("tmp3");
+    ofstream outputfile3("tmp3");
+
+    std::vector<unsigned long long> s_vec_1;
+    std::vector<float> s_vec_2;
+    std::vector<float> s_vec_3;
+    std::vector<float> s_vec_4;
     
+    counter = 0;
+    for( CharTable3::iterator i=table3.begin(); i!=table3.end(); ++i )
+    {
+      if(counter < table3.size() && (int)i->first > 0)
+	{
+	  s_vec_1.push_back((unsigned long long)i->first);
+	  s_vec_2.push_back((int)i->second);
+	}
+      
+      counter = counter + 1;
+    }
+
+    counter = 0;
+    for( CharTable2::iterator i=table2.begin(); i!=table2.end(); ++i )
+    {
+      if(counter < table2.size() && (int)i->first > 0)
+	{
+	  //std::cout << i->first << "," << i->second << endl;       
+	  s_vec_3.push_back((unsigned long long)i->first);
+	  s_vec_4.push_back((int)i->second);
+	  
+	}
+	  
+      counter = counter + 1;
+    }
+
+    for(int i = 0; i < s_vec_1.size(); i++)
+      {
+	double tmp_div;
+	if (s_vec_4[i] == 0)
+	  tmp_div = 0;
+	else if (s_vec_4[i] > 0)
+	  tmp_div =  (double)s_vec_2[i] / (double)s_vec_4[i];
+	
+	outputfile3 << s_vec_1[i] << "," << s_vec_2[i] << "," << s_vec_4[i] << endl;
+      }
+
+    outputfile3.close();
+
+    const size_t SQRT_K = 4;
+    const size_t K = SQRT_K*SQRT_K;
+    const size_t M = s_vec_1.size();
+    
+    point* points;
+    points = (struct point *)malloc(M*sizeof(struct point));
+
+    point* centroid;
+    centroid = (struct point *)malloc(M*sizeof(struct point));
+
+    cluster_id* id;
+    id = (unsigned short *)malloc(M*sizeof(unsigned short));
+
+    std::vector<string> pair; 
+    
+    for (int i = 0; i < M; i++) {
+
+      point& p = points[i];
+
+      p.x = (float)s_vec_2[i];
+      p.y = (float)s_vec_4[i];
+      pair.push_back(to_string(s_vec_1[i]));
+    }
+
+    tbb_example::compute_k_means( M, points, K, id, centroid );
+
+#if 1
+    int* counts;
+    counts = (int *)malloc(K*sizeof(int));
+
+    for( size_t i=0; i<M; ++i ) {
+      counts[id[i]] = 0;
+    }
+    
+    for( size_t i=0; i<M; ++i ) {
+      counts[id[i]]++;
+    }
+      
+    for( size_t i=0; i<M; ++i ) {
+
+	    unsigned long pair_long = std::stoul(pair[i]);
+      
+	    std::bitset<64> bset_pair = std::bitset<64>(pair_long);   
+	    string bset_pair_string = bset_pair.to_string();
+	    
+	    std::string ip1 = bset_pair_string.substr(0, 8);
+	    std::string ip2 = bset_pair_string.substr(8, 8);
+	    std::string ip3 = bset_pair_string.substr(16, 8);
+	    std::string ip4 = bset_pair_string.substr(24, 8);
+
+	    std::bitset<8> ip1_bset = std::bitset<8>(ip1);
+	    std::bitset<8> ip2_bset = std::bitset<8>(ip2);
+	    std::bitset<8> ip3_bset = std::bitset<8>(ip3);
+	    std::bitset<8> ip4_bset = std::bitset<8>(ip4);
+
+	    std::cout << ip1_bset.to_ulong() << "." << ip2_bset.to_ulong() << "." << ip3_bset.to_ulong() << "." << ip4_bset.to_ulong() << ",";
+	    
+	    std::string ip5 = bset_pair_string.substr(32, 8);
+	    std::string ip6 = bset_pair_string.substr(40, 8);
+	    std::string ip7 = bset_pair_string.substr(48, 8);
+	    std::string ip8 = bset_pair_string.substr(56, 8);
+
+	    std::bitset<8> ip5_bset = std::bitset<8>(ip5);
+	    std::bitset<8> ip6_bset = std::bitset<8>(ip6);
+	    std::bitset<8> ip7_bset = std::bitset<8>(ip7);
+	    std::bitset<8> ip8_bset = std::bitset<8>(ip8);
+
+	    std::cout << ip5_bset.to_ulong() << "." << ip6_bset.to_ulong() << "." << ip7_bset.to_ulong() << "." << ip8_bset.to_ulong() << " -> ";
+
+	    float percent = (float)counts[id[i]]/(float)M;
+	    printf("%d (%g %g) counts %d / %d [%f%] \n",id[i],points[i].x,points[i].y, counts[id[i]], N, percent); 
+    }
+
+#endif
+    
+#if 1
+    printf("centroids = ");
+    for( size_t j=0; j<K; ++j ) {
+        printf("(%g %g)",centroid[j].x,centroid[j].y);
+    }
+    printf("\n");
+#endif
+
     return 0;
 }
+
