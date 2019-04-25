@@ -784,8 +784,8 @@ int main(int argc, char* argv[]) {
     int counter = 0;
     std::cout << "table3:" << table3.size() << endl;
 
-    std::remove("tmp3");
-    ofstream outputfile3("tmp3");
+    std::remove("tmp");
+    ofstream outputfile3("tmp");
 
     std::vector<unsigned long long> s_vec_1;
     std::vector<float> s_vec_2;
@@ -868,7 +868,10 @@ int main(int argc, char* argv[]) {
     for( size_t i=0; i<M; ++i ) {
       counts[id[i]]++;
     }
-      
+
+    std::remove("tmp2");
+    ofstream outputfile4("tmp2");
+    
     for( size_t i=0; i<M; ++i ) {
 
 	    unsigned long pair_long = std::stoul(pair[i]);
@@ -886,6 +889,8 @@ int main(int argc, char* argv[]) {
 	    std::bitset<8> ip3_bset = std::bitset<8>(ip3);
 	    std::bitset<8> ip4_bset = std::bitset<8>(ip4);
 
+	    outputfile4 << ip1_bset.to_ulong() << "." << ip2_bset.to_ulong() << "." << ip3_bset.to_ulong() << "." << ip4_bset.to_ulong() << ",";
+	    
 	    std::cout << ip1_bset.to_ulong() << "." << ip2_bset.to_ulong() << "." << ip3_bset.to_ulong() << "." << ip4_bset.to_ulong() << ",";
 	    
 	    std::string ip5 = bset_pair_string.substr(32, 8);
@@ -898,11 +903,19 @@ int main(int argc, char* argv[]) {
 	    std::bitset<8> ip7_bset = std::bitset<8>(ip7);
 	    std::bitset<8> ip8_bset = std::bitset<8>(ip8);
 
+	    outputfile4 << ip5_bset.to_ulong() << "." << ip6_bset.to_ulong() << "." << ip7_bset.to_ulong() << "." << ip8_bset.to_ulong() << " -> ";
+	    
 	    std::cout << ip5_bset.to_ulong() << "." << ip6_bset.to_ulong() << "." << ip7_bset.to_ulong() << "." << ip8_bset.to_ulong() << " -> ";
 
 	    float percent = (float)counts[id[i]]/(float)M;
-	    printf("%d (%g %g) counts %d / %d [%f%] \n",id[i],points[i].x,points[i].y, counts[id[i]], N, percent); 
+	    printf("%d (%g %g) counts %d / %d [%f%] \n",id[i],points[i].x, points[i].y, counts[id[i]], M, percent);
+
+	    outputfile4 << id[i] << " (" << points[i].x << "," << points[i].y << ")," << counts[id[i]] << "," << M << "," << percent << "%" << endl;
+	    
+	
     }
+
+    outputfile4.close();
 
 #endif
     
