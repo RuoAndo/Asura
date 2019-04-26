@@ -15,7 +15,7 @@ void fix_empty_clusters( size_t n, const point points[], cluster_id id[], size_t
                     farthest = i;
                 }
             }
-#endif
+//#endif
             id[farthest] = j;
             sum[j].count = 1;
             sum[j].sum = points[farthest];
