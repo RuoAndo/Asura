@@ -62,5 +62,5 @@ Asura One
             }
 </pre>
 
-8. Performance test
+8. Processing time: about 30 minutes for about 400,000,000 packets
 
