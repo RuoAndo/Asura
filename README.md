@@ -33,14 +33,14 @@ https://github.com/RuoAndo/Asura/tree/master/1
 8: concurrent hash map -> thrust::host_vector()
 9: Broken
 10: Broken
-11: concurrent hash map with hashcompare()
-12: stl wrapped by mutex
-13: stl wrapped by mutex
-14: concurrent vector without hashcompare()
+11: 
+12: 
+13: 
+14: 
 15: 
 16: 
-17: concurrent vector without hashcompare() writing files
+17: concurrent vector without hashcompare() and CUDA Thrust
 18:
 19:
-20: thrust without vector
+20: 
 </pre>
