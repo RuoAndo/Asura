@@ -1,6 +1,6 @@
 Asura One: A portable packet analyzer of hundreds gigabytes PCAP file using highly concurrent container for Laptops
 
-<img src="../asura0.jpeg" width=200 height=200>
+<img src="../asura1.jpeg" width=200 height=200>
 
 1.Lisence: Asura One is now released as Open Source under MIT license in github.com. 
 
@@ -8,7 +8,7 @@ Asura One: A portable packet analyzer of hundreds gigabytes PCAP file using high
 
 3.Input: PCAP files in the directory 
 
-4.Usage: ./asura DIRECTORY_NAME
+4.Usage: ./a.out DIRECTORY_NAME
 
 <pre>
 	# mkdir pcap
