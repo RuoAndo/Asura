@@ -24,7 +24,7 @@ Asura One
 <pre>
 	sourceIP,destIP->clusterNo (length, counts), clusterSize, AllSize, Anomaly_score(%)
 	X.X.X.X,Y.Y.Y.Y -> 7 (275912,48),46,118644,0.0387715%
-　　　	X.X.X.X,Z.Z.Z.Z -> 5 (73445,48),288,118644,0.242743%
+　　　   X.X.X.X,Z.Z.Z.Z -> 5 (73445,48),288,118644,0.242743%
 </pre>
 　
 *Packet dump was drastically reduced from 83GB to 7MB with about 110,000 extracted flow vectors which are useful for the further careful inspection by Wireshark.
