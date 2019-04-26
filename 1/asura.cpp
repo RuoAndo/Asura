@@ -522,7 +522,7 @@ int traverse_file(char* filename, char* srchstr, int thread_id) {
 		{
 		  //if(thread_id % WORKER_THREAD_NUM == 0)
 		  if(counter % DISP_FREQ == 0)
-		    printf("worker@1stPhase:threadID:%d:filename:%s IP 080045:counter:%d\n", thread_id, filename, counter);
+		    printf("threadID:%d:filename:%s IP sig 080045:# of packets processed:%d\n", thread_id, filename, counter);
 		  
 		  fseek(fp,-1.5L,SEEK_CUR);
 		  if (fgets(buf, sizeof(struct iphdr)+8, fp) != NULL)
@@ -780,6 +780,9 @@ int main(int argc, char* argv[]) {
     for (i = 1; i < thread_num; ++i) 
         pthread_join(worker[i], NULL);
 
+    travdirtime = stop_timer(&t);
+    print_timer(travdirtime);
+    
     int counter = 0;
     std::cout << "table3:" << table3.size() << endl;
 
@@ -854,8 +857,11 @@ int main(int argc, char* argv[]) {
       pair.push_back(to_string(s_vec_1[i]));
     }
 
-    tbb_example::do_k_means( M, points, K, id, centroid );
-
+    start_timer(&t);
+    tbb_asura::do_k_means( M, points, K, id, centroid );
+    travdirtime = stop_timer(&t);
+    print_timer(travdirtime);
+    
 #if 1
     int* counts;
     counts = (int *)malloc(K*sizeof(int));
@@ -889,9 +895,11 @@ int main(int argc, char* argv[]) {
 	    std::bitset<8> ip4_bset = std::bitset<8>(ip4);
 
 	    outputfile4 << ip1_bset.to_ulong() << "." << ip2_bset.to_ulong() << "." << ip3_bset.to_ulong() << "." << ip4_bset.to_ulong() << ",";
-	    
+
+	    /*
 	    std::cout << ip1_bset.to_ulong() << "." << ip2_bset.to_ulong() << "." << ip3_bset.to_ulong() << "." << ip4_bset.to_ulong() << ",";
-	    
+	    */	    
+
 	    std::string ip5 = bset_pair_string.substr(32, 8);
 	    std::string ip6 = bset_pair_string.substr(40, 8);
 	    std::string ip7 = bset_pair_string.substr(48, 8);
@@ -903,11 +911,13 @@ int main(int argc, char* argv[]) {
 	    std::bitset<8> ip8_bset = std::bitset<8>(ip8);
 
 	    outputfile4 << ip5_bset.to_ulong() << "." << ip6_bset.to_ulong() << "." << ip7_bset.to_ulong() << "." << ip8_bset.to_ulong() << " -> ";
-	    
+
+	    /*
 	    std::cout << ip5_bset.to_ulong() << "." << ip6_bset.to_ulong() << "." << ip7_bset.to_ulong() << "." << ip8_bset.to_ulong() << " -> ";
+	    */
 
 	    float percent = (float)counts[id[i]]/(float)M;
-	    printf("%d (%g %g) counts %d / %d [%f%] \n",id[i],points[i].x, points[i].y, counts[id[i]], M, percent);
+	    // printf("%d (%g %g) counts %d / %d [%f%] \n",id[i],points[i].x, points[i].y, counts[id[i]], M, percent);
 
 	    // outputfile4 << id[i] << " (" << points[i].x << "," << points[i].y << ")," << counts[id[i]] << "," << M << "," << percent << "%" << endl;
 
@@ -920,7 +930,7 @@ int main(int argc, char* argv[]) {
 
 #endif
     
-#if 1
+#if 0
     printf("centroids = ");
     for( size_t j=0; j<K; ++j ) {
         printf("(%g %g)",centroid[j].x,centroid[j].y);
