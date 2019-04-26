@@ -1,4 +1,4 @@
-void compute_k_means( size_t n, const point points[], size_t k, cluster_id id[], point centroid[] ) {
+void do_k_means( size_t n, const point points[], size_t k, cluster_id id[], point centroid[] ) {
 
     tls_type tls([&]{return k;}); 
     view global(k);
