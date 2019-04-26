@@ -38,7 +38,7 @@ void compute_k_means( size_t n, const point points[], size_t k, cluster_id id[],
                 view& v = tls.local();
                 for( size_t i=r.begin(); i!=r.end(); ++i ) {
                     // "Reassign step": Find index of centroid closest to points[i]
-                    cluster_id j = reduce_min_ind(centroid, k , points[i]); 
+                    cluster_id j = calc_shortest_index(centroid, k , points[i]); 
                     if( j!=id[i] ) {
                         id[i] = j;
                         ++v.change;
