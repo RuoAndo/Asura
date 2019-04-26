@@ -9,7 +9,7 @@ PLAN2(2019.02-2019.03): NVidia Cuda Thrust is going to be adopted.
 <br>
 PLAN3(2019.04-2019.06): NVLink is going to be adopted.
 
-<b>2019.04.21: Asura 0 is released (DEFCON 26)</b>
+<b>2019.04.21: Asura 0 is n released (DEFCON 26)</b>
 
 <img src="asura0.jpeg" width=200 height=200>
 https://github.com/RuoAndo/Asura/tree/master/0
