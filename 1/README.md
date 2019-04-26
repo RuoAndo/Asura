@@ -1,7 +1,6 @@
 Asura One: A portable packet analyzer of hundreds gigabytes PCAP file using highly concurrent container for Laptops
 
-
-Include licensing - Free/Open Source (GPL or others) /Shareware/Other - and changelog details since last Black Hat, if applicable
+<img src="../asura0.jpeg" width=200 height=200>
 
 1.Lisence: Asura One is now released as Open Source under MIT license in github.com. 
 
@@ -20,7 +19,7 @@ Include licensing - Free/Open Source (GPL or others) /Shareware/Other - and chan
         # ./a.out pcap
 </pre>
 
-5. utput: <sourceIP, destinationIP>, anomaly_rate
+5.Output: <sourceIP, destinationIP>, anomaly_rate
 
 <pre>
 	sourceIP,destIP->clusterNo (length, counts), clusterSize, AllSize, Anomaly_score(%)
@@ -63,5 +62,5 @@ Include licensing - Free/Open Source (GPL or others) /Shareware/Other - and chan
             }
 </pre>
 
-8. erformance test
+8. Performance test
 
