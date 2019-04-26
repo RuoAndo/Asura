@@ -910,7 +910,9 @@ int main(int argc, char* argv[]) {
 	    float percent = (float)counts[id[i]]/(float)M;
 	    printf("%d (%g %g) counts %d / %d [%f%] \n",id[i],points[i].x, points[i].y, counts[id[i]], M, percent);
 
-	    outputfile4 << id[i] << " (" << points[i].x << "," << points[i].y << ")," << counts[id[i]] << "," << M << "," << percent << "%" << endl;
+	    // outputfile4 << id[i] << " (" << points[i].x << "," << points[i].y << ")," << counts[id[i]] << "," << M << "," << percent << "%" << endl;
+
+	    outputfile4 << id[i] << " (" << points[i].x << "," << points[i].y << ")," << counts[id[i]] << "," << M << "," << percent << endl;
 	    
 	
     }

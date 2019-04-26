@@ -3,14 +3,13 @@
 
 <img src="asura.png" width=200 height=200>
 
-PLAN1: Cocurrent hash map (Intel TBB) is going to be adopted: 2018.10-2018.11
-2019.01.22: directory "1", "2" and "3" newly added which is going to be adopt concurrent hashmap (lock-free) of Intel TBB. 
+PLAN1(2018.10-2018.11): Cocurrent hash map (Intel TBB) is going to be adopted.
 <br>
-PLAN2: NVidia Cuda Thrust is going to be adopted: 2019.02-2019.03
-2019.02.14: directory "4" newly added which is work with Cuda Thrust.
-PLAN3: NVLink is going to be adopted: 2019.04-
+PLAN2(2019.02-2019.03): NVidia Cuda Thrust is going to be adopted.
+<br>
+PLAN3(2019.04-2019.06): NVLink is going to be adopted.
 
-2019.04: Asura 0 is released (DEFCON 26)
+2019.04: Asura 1 is released (DEFCON 26)
 
 <img src="asura0.jpeg" width=200 height=200>
 
