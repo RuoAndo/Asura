@@ -12,10 +12,12 @@ PLAN3(2019.04-2019.06): NVLink is going to be adopted.
 <b>2019.04.21: Asura 0 is released (DEFCON 26)</b>
 
 <img src="asura0.jpeg" width=200 height=200>
+https://github.com/RuoAndo/Asura/tree/master/0
 
 <b>2019.04.26: Asura 1 is released </b>
 
 <img src="asura1.jpeg" width=200 height=200>
+https://github.com/RuoAndo/Asura/tree/master/1
 
 <pre>
 0: original - DEFCON 26
