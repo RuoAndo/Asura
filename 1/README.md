@@ -8,7 +8,7 @@ Asura One
 
 3.Input: PCAP files in the directory 
 
-4.Usage: ./a.out DIRECTORY_NAME
+4.Usage: ./asura DIRECTORY_NAME
 
 <pre>
 	# mkdir pcap
@@ -16,10 +16,10 @@ Asura One
         # wget https://download.netresec.com/pcap/maccdc-2012/maccdc2012_*.pcap.gz
         # cd ..
 	# ./build-asura.sh 
-        # ./a.out pcap
+        # ./asura pcap
 </pre>
 
-5.Output: <sourceIP, destinationIP>, anomaly_rate
+5.Output: {<sourceIP, destinationIP>, Anomaly_Score}
 
 <pre>
 	sourceIP,destIP->clusterNo (length, counts), clusterSize, AllSize, Anomaly_score(%)
@@ -27,7 +27,7 @@ Asura One
 　　　	X.X.X.X,Z.Z.Z.Z -> 5 (73445,48),288,118644,0.242743%
 </pre>
 　
-*Packet capture data is drastically reduced from 83GB to about 7MB with about 110,000 flow vectors which is worth for the further careful examination by Wireshark.
+*Packet dump was drastically reduced from 83GB to 7MB with about 110,000 extracted flow vectors which are useful for the further careful inspection by Wireshark.
 
 6.Procedure 1: extracting flow vector {<srcIP, dstIP>, X, Y}
 <pre>
@@ -44,7 +44,7 @@ Asura One
  	       pthread_join(worker[i], NULL);
 </pre>
 
-7.Procedure 2: calculating anomaly score with flow vector {<srcIP, dstIP>, Anomaly_Score}
+7.Procedure 2: calculating anomaly score {<srcIP, dstIP>, Anomaly_Score}
 <pre>
 	  Main loop (K-Means):
 	  tbb::parallel_for(
