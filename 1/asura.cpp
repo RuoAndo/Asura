@@ -52,8 +52,7 @@
 using namespace std;
 using namespace tbb;
 
-
-#define N 1000
+#define N 100
 #define WORKER_THREAD_NUM N
 #define MAX_QUEUE_NUM N
 #define END_MARK_FNAME   "///"
@@ -855,7 +854,7 @@ int main(int argc, char* argv[]) {
       pair.push_back(to_string(s_vec_1[i]));
     }
 
-    tbb_example::compute_k_means( M, points, K, id, centroid );
+    tbb_example::do_k_means( M, points, K, id, centroid );
 
 #if 1
     int* counts;
