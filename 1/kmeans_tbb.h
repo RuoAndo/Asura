@@ -18,7 +18,7 @@ void compute_k_means( size_t n, const point points[], size_t k, cluster_id id[],
     size_t change;
     do {
         convert_local_sums_to_global_sum( k, tls, global );
-        repair_empty_clusters( n, points, id, k, centroid, global.array );
+        fix_empty_clusters( n, points, id, k, centroid, global.array );
         
         for( size_t j=0; j<k; ++j ) {
             centroid[j] = global.array[j].mean();
