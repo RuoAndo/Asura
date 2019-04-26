@@ -1,27 +1,67 @@
-Asura 1 adopting concurrent hash map of Intel TBB.
-This version is faster than verion 0 (DEFCON26) which uses mutex. 
+Asura One: A portable packet analyzer of hundreds gigabytes PCAP file using highly concurrent container for Laptops
+
+
+Include licensing - Free/Open Source (GPL or others) /Shareware/Other - and changelog details since last Black Hat, if applicable
+
+1.Lisence: Asura One is now released as Open Source under MIT license in github.com. 
+
+2.Compiler and libraries: gcc version 7.3.0 (Ubuntu 7.3.0), Posix Pthreads and Intel TBB.
+
+3.Input: PCAP files in the directory 
+
+4.Usage: ./asura DIRECTORY_NAME
 
 <pre>
-PLAN1: implementing second scatter in version 0. / 2019.01 - 2019.02
-PLAN2: adopting bitset<> for faster reduction. / 2019.01 - 2019.02
+	# mkdir pcap
+        # cd pcap 
+        # wget https://download.netresec.com/pcap/maccdc-2012/maccdc2012_*.pcap.gz
+        # cd ..
+	# ./build-asura.sh 
+        # ./a.out pcap
 </pre>
 
-usage:
+5. utput: <sourceIP, destinationIP>, anomaly_rate
 
-creating directory.
 <pre>
-# mkdir pcap
-# cd pcap
+	sourceIP,destIP->clusterNo (length, counts), clusterSize, AllSize, Anomaly_score(%)
+	X.X.X.X,Y.Y.Y.Y -> 7 (275912,48),46,118644,0.0387715%
+　　　	X.X.X.X,Z.Z.Z.Z -> 5 (73445,48),288,118644,0.242743%
+</pre>
+　
+*Packet capture data is drastically reduced from 83GB to about 7MB with about 110,000 flow vectors which is worth for the further careful examination by Wireshark.
+
+6.Procedure 1: extracting flow vector {<srcIP, dstIP>, X, Y}
+<pre>
+	Container: typedef concurrent_hash_map<unsigned long long, int, HashCompare>
 </pre>
 
-download pcap file. For example, 
 <pre>
-# wget https://download.netresec.com/pcap/maccdc-2012/maccdc2012_*****.pcap.gz
+	Main loop: 
+  	pthread_create(&master, NULL, (void*)master_func, (void*)&targ[0]);
+    	  for (i = 1; i < thread_num; ++i) { 
+        	targ[i].id = i;
+       		pthread_create(&worker[i],NULL,(void*)worker_func,(void*)&targ[i]); }
+    	  for (i = 1; i < thread_num; ++i) 
+ 	       pthread_join(worker[i], NULL);
 </pre>
 
-execute.
+7.Procedure 2: calculating anomaly score with flow vector {<srcIP, dstIP>, Anomaly_Score}
 <pre>
-# cd ..
-# make
-# ./asura ./pcap
+	  Main loop (K-Means):
+	  tbb::parallel_for(
+          tbb::blocked_range<size_t>(0,n),
+          [=,&tls,&global]( tbb::blocked_range<size_t> r ) {
+              view& v = tls.local();
+              for( size_t i=r.begin(); i!=r.end(); ++i ) {
+                  cluster_id j = calc_shortest_index(centroid, k , points[i]); 
+                  if( j!=id[i] ) {
+                      id[i] = j;
+                      ++v.change;
+                  }
+                  v.array[j].tally(points[i]);
+              }
+            }
 </pre>
+
+8. erformance test
+
