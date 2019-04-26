@@ -1,4 +1,4 @@
-Asura One: A portable packet analyzer of hundreds gigabytes PCAP file using highly concurrent container for Laptops
+Asura One
 
 <img src="asura1.jpeg" width=200 height=200>
 
