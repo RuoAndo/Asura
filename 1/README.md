@@ -8,7 +8,7 @@ Asura One is a portable anomaly detector of large packet capture file (around 10
 
 In experiment, Asura One has processed about 400,000,000 packets with 83GB PCAP file size in about 30 minutes on laptop PC. Packet dump was drastically reduced from 83GB to 7MB with about 110,000 aggregated flow vectors which are feasible for the further careful inspection by Wireshark.
 
-1.Lisence: Asura One is now released as Open Source under MIT license in github.com. 
+1.Lisence: Asura One is now released as open source under MIT license. 
 
 2.Compiler and libraries: gcc version 7.3.0 (Ubuntu 7.3.0), Posix Pthreads and Intel TBB.
 
