@@ -12,6 +12,8 @@ PLAN3(2019.04-2019.06): NVLink is going to be adopted.
 <b>2019.04.21: Asura 0 is newly released (DEFCON 26)</b>
 
 <img src="asura0.jpeg" width=200 height=200>
+
+A huge PCAP file analyzer for anomaly packets detection using massive multithreading (DEFCON 26)<br>
 https://github.com/RuoAndo/Asura/tree/master/0
 <br><br>
 
