@@ -15,7 +15,7 @@ PLAN3(2019.04-2019.06): NVLink is going to be adopted.
 https://github.com/RuoAndo/Asura/tree/master/0
 <br><br>
 
-<b>2019.04.26: Asura 1 is released </b>
+<b>2019.04.26: Asura 1 is released </b><br>
 A portable anomaly detector for 100GB PCAP file in laptop using highly concurrent container
 <img src="asura1.jpeg" width=200 height=200>
 https://github.com/RuoAndo/Asura/tree/master/1
