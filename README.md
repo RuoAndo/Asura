@@ -23,13 +23,13 @@ https://github.com/RuoAndo/Asura/tree/master/1
 
 <pre>
 0: original - DEFCON 26
-1: turbo
-2: hash table by Intel TBB
-3: stl wrapped by mutex
+1: concurrent hash map with hashcompare()
+2: 
+3: 
 4: Broken
 5: Broken
 6: Broken
-7: concurrent hash map with hashcompare()
+7: 
 8: concurrent hash map -> thrust::host_vector()
 9: Broken
 10: Broken
