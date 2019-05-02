@@ -9,7 +9,7 @@ PLAN2(2019.02-2019.03): NVidia Cuda Thrust is going to be adopted.
 <br>
 PLAN3(2019.04-2019.06): NVLink is going to be adopted.
 
-<b>2019.04.21: Asura 0 is newly released (DEFCON 26)</b>
+<b>Asura 0(DEFCON 26)</b>
 
 <img src="asura0.jpeg" width=200 height=200>
 
@@ -17,7 +17,7 @@ A huge PCAP file analyzer for anomaly packets detection using massive multithrea
 https://github.com/RuoAndo/Asura/tree/master/0
 <br><br>
 
-<b>2019.04.26: Asura 1 is released </b>
+<b>Asura 1</b>
 
 <img src="asura1.jpeg" width=200 height=200>
 
