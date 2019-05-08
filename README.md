@@ -22,7 +22,7 @@ A huge PCAP file analyzer for anomaly packets detection using massive multithrea
 https://github.com/RuoAndo/Asura/tree/master/0
 <br><br>
 
-<b>Asura 1(With Intel TBB)</b>
+<b>Asura 1(with Intel TBB)</b>
 
 <img src="asura1.jpeg" width=200 height=200>
 
