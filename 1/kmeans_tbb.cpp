@@ -10,7 +10,7 @@
 #include "reduce_local_sums_to_global_sum.h"
 #include "reduce_min_ind.h"
 
-namespace tbb_example {
+namespace tbb_asura {
 
 #include "kmeans_tbb.h"
 

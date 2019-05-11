@@ -24,12 +24,14 @@ inline float distance2( const point& a, const point& b ) {
 
 typedef unsigned short cluster_id;
 
-void repair_empty_clusters( size_t n, const point points[], cluster_id id[], size_t k, point centroid[], sum_and_count sum[] );
+void fix_empty_clusters( size_t n, const point points[], cluster_id id[], size_t k, point centroid[], sum_and_count sum[] );
 
+/*
 namespace cilk_example {
     void compute_k_means( size_t n, const point points[], size_t k, cluster_id id[], point centroid[] ); 
 }
+*/
 
-namespace tbb_example {
-    void compute_k_means( size_t n, const point points[], size_t k, cluster_id id[], point centroid[] ); 
+namespace tbb_asura {
+    void do_k_means( size_t n, const point points[], size_t k, cluster_id id[], point centroid[] ); 
 }
