@@ -10,4 +10,47 @@ In experiment, in processing public PCAP datasets, Asura can identified 750 pack
 
 1.Lisence: Asura One is now released as open source under MIT license.
 
-2.Compiler and libraries: gcc version 7.3.0 (Ubuntu 7.3.0), Posix Pthreads and Intel TBB.
+2.Compiler and libraries: gcc version 7.3.0 (Ubuntu 7.3.0), Posix Pthreads.
+
+3.Input: PCAP files in the directory 
+
+4.Usage: ./asura DIRECTORY_NAME
+
+<pre>
+	# mkdir pcap
+        # cd pcap 
+        # wget https://download.netresec.com/pcap/maccdc-2012/maccdc2012_*.pcap.gz
+        # cd ..
+	# ./build-asura.sh 
+        # ./asura pcap
+</pre>
+
+5.Output: {<sourceIP, destinationIP>, Anomaly_Score}
+
+<pre>
+	sourceIP,destIP->clusterNo (length, counts), clusterSize, AllSize, Anomaly_score(%)
+	X.X.X.X,Y.Y.Y.Y -> 7 (275912,48),46,118644,0.0387715%
+　　　   X.X.X.X,Z.Z.Z.Z -> 5 (73445,48),288,118644,0.242743%
+</pre>
+　
+6.Procedure 1: extracting flow vector {<srcIP, dstIP>, X, Y}
+<pre>
+	Container: 
+    /* srcIP, destIP */                                                                                                   
+    typedef struct _addrpair {                                                                                            
+    map<string, string> m;                                                                                              
+    pthread_mutex_t mutex;                                                                                              
+    } addrpair_t;                                                                                                         
+    addrpair_t addrpair;                                                                                                  
+                                                                                                                        
+    /* reduced */                                                                                                         
+    typedef struct _reduced {                                                                                             
+      map<int, int> count;                                                                                                
+      map<int, int> tlen;                                                                                                 
+      map<int, int> ttl;                                                                                                  
+      map<int, int> sport;                                                                                                
+      map<int, int> dport;                                                                                                
+      pthread_mutex_t mutex;                                                                                              
+    } reduced_t;                                                                                                          
+    reduced_t reduced;    
+</pre>
