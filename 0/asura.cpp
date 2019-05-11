@@ -36,8 +36,8 @@
 
 using namespace std;
 
-#define WORKER_THREAD_NUM 3
-#define MAX_QUEUE_NUM 10
+#define WORKER_THREAD_NUM 10
+#define MAX_QUEUE_NUM 20
 #define END_MARK_FNAME   "///"
 #define END_MARK_FLENGTH 3
 
