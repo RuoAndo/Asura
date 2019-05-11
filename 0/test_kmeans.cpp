@@ -83,6 +83,7 @@ std::vector < std::vector< std::string > > parse_csv(const char* filepath)
     return cells;
 }
 
+/*
 int main(int argc, char* argv[]) {
 
   const size_t SQRT_K = 4;
@@ -99,11 +100,7 @@ int main(int argc, char* argv[]) {
   id = (unsigned short *)malloc(N*sizeof(unsigned short));
 
   std::vector<string> pair; 
-  
-    // point points[N];
-    // point centroid[K];
-    // cluster_id id[N];
-  
+    
     printf("Testing TBB kmeans algorithm...\n");
 
     const auto cells = parse_csv(argv[1]);
@@ -117,47 +114,24 @@ int main(int argc, char* argv[]) {
       p.y = std::stof(rows[2]);      
       pair.push_back(rows[0]);
       
-      // cout << p.x << "," << p.y << endl;
-      
       counter = counter + 1;
     }
     
-    // Compute the K means
     tbb_example::compute_k_means( N, points, K, id, centroid );
 
-    /*
-    int found[SQRT_K][SQRT_K];
-    std::memset( found, 0, sizeof(found) );
-    for( size_t i=0; i<K; ++i ) {
-        const point& c = centroid[i];
-        int rx = floor(c.x+0.5);
-        int ry = floor(c.y+0.5);
-        found[ry][rx]++;
-        point g;
-        g.x = rx; 
-        g.y = ry; 
-        float d = distance2( c, g );
-        const float tolerance = 1/std::sqrt(float(N));
-        if( d>tolerance ) {
-            printf("warning: centroid[%d]=(%g,%g) seems surprisingly far from grid point\n",int(i),c.x,c.y);
-        }
-    }
-    for( size_t y=0; y<SQRT_K; ++y ) 
-        for( size_t x=0; x<SQRT_K; ++x ) 
-            if( found[y][x]!=1 )
-                printf("warning: found[%d][%d]=%d\n", int(x), int(y), found[y][x]);
-    */
 #if 1
 
     int* counts;
     counts = (int *)malloc(K*sizeof(int));
+
+    for( size_t i=0; i<N; ++i ) {
+      counts[id[i]] = 0;
+    }
     
     for( size_t i=0; i<N; ++i ) {
-      // printf("%d (%g %g)\n",id[i],points[i].x,points[i].y);
       counts[id[i]]++;
     }
       
-    // Print the points
     for( size_t i=0; i<N; ++i ) {
 
 	    unsigned long pair_long = std::stoul(pair[i]);
@@ -176,11 +150,6 @@ int main(int argc, char* argv[]) {
 	    std::bitset<8> ip4_bset = std::bitset<8>(ip4);
 
 	    std::cout << ip1_bset.to_ulong() << "." << ip2_bset.to_ulong() << "." << ip3_bset.to_ulong() << "." << ip4_bset.to_ulong() << ",";
-
-	    // pair_long = std::stol(rec[2]);
-      
-	    // bset_pair = std::bitset<32>(pair_long);   
-	    // bset_pair_string = bset_pair.to_string();
 	    
 	    std::string ip5 = bset_pair_string.substr(32, 8);
 	    std::string ip6 = bset_pair_string.substr(40, 8);
@@ -195,11 +164,10 @@ int main(int argc, char* argv[]) {
 	    std::cout << ip5_bset.to_ulong() << "." << ip6_bset.to_ulong() << "." << ip7_bset.to_ulong() << "." << ip8_bset.to_ulong() << " -> ";
 
 	    float percent = (float)counts[id[i]]/(float)N;
-	    printf("%d (%g %g) [%f%] \n",id[i],points[i].x,points[i].y, percent); 
+	    printf("%d (%g %g) counts %d / %d [%f%] \n",id[i],points[i].x,points[i].y, counts[id[i]], N, percent); 
     }
 #endif
 #if 1
-    // Print the centroids
     printf("centroids = ");
     for( size_t j=0; j<K; ++j ) {
         printf("(%g %g)",centroid[j].x,centroid[j].y);
@@ -209,3 +177,4 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
+*/

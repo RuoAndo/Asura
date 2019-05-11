@@ -1,4 +1,4 @@
-int reduce_min_ind( const point centroid[], size_t k, point value ) { 
+int calc_shortest_index( const point centroid[], size_t k, point value ) { 
     int min = -1;
     float mind = std::numeric_limits<float>::max();
     for( int j=0; j<k; ++j ) {
