@@ -1,4 +1,4 @@
-README is going to be relased on 2019.04.27.
+Asura 0 with STL (Standard Template Library)
 
 <img src="../asura0.jpeg" width=200 height=200>
 
@@ -53,4 +53,22 @@ Container:
       pthread_mutex_t mutex;                                                                                              
     } reduced_t;                                                                                                          
     reduced_t reduced;    
+</pre>
+
+7.Procedure 2: calculating anomaly score {<srcIP, dstIP>, Anomaly_Score}
+<pre>
+	  Main loop (K-Means):
+	  tbb::parallel_for(
+          tbb::blocked_range<size_t>(0,n),
+          [=,&tls,&global]( tbb::blocked_range<size_t> r ) {
+              view& v = tls.local();
+              for( size_t i=r.begin(); i!=r.end(); ++i ) {
+                  cluster_id j = calc_shortest_index(centroid, k , points[i]); 
+                  if( j!=id[i] ) {
+                      id[i] = j;
+                      ++v.change;
+                  }
+                  v.array[j].tally(points[i]);
+              }
+            }
 </pre>
