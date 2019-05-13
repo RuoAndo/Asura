@@ -786,8 +786,8 @@ int main(int argc, char* argv[]) {
     int counter = 0;
     std::cout << "table3:" << table3.size() << endl;
 
-    std::remove("tmp");
-    ofstream outputfile3("tmp");
+    std::remove("reduced");
+    ofstream outputfile3("reduced");
 
     std::vector<unsigned long long> s_vec_1;
     std::vector<float> s_vec_2;
@@ -874,8 +874,8 @@ int main(int argc, char* argv[]) {
       counts[id[i]]++;
     }
 
-    std::remove("tmp2");
-    ofstream outputfile4("tmp2");
+    std::remove("clustered");
+    ofstream outputfile4("clustered");
     
     for( size_t i=0; i<M; ++i ) {
 
