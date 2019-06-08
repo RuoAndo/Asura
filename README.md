@@ -33,18 +33,6 @@ https://github.com/RuoAndo/Asura/tree/master/1
 <pre>
 0: original - DEFCON 26
 1: concurrent hash map with hashcompare()
-2: 
-3: 
-4: Broken
-5: Broken
-6: Broken
-7: 
-8: concurrent hash map -> thrust::host_vector()
-9: Broken
-10: Broken
-11: 
-12: 
-13: 
 14: 
 15: 
 16: 
