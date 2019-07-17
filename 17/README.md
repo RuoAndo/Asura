@@ -2,11 +2,9 @@ Asura 17: A GPU acclerated packets cluctering using highly concurrent container<
 
 <img src="asura17.jpeg" width=200 height=200>
 
-<pre>
 The rapid increase of security log has been imposing a great burden on security analysts and researchers. Particularly, in the recent several years, we are facing more and more the situation in which we cope with terabyte-scale traffic dump for various purposes such as network forensics, incident response and CTF. Unfortunately, the emergence of terabyte-scale PCAP file has nullified the effectiveness of the most of good old arts of concurrency. Many conventional techniques such as concurrent hashmap, atomic instruction and lock-based mechanism implemented on SIMD architecture are not so practical any longer in the struggle against terabyte-scale PCAP file.
 
   Asura 17 has a deep impact of "SMIT after SMID" parallelization over the anomaly detection of terabyte-scale traffic dump is reported. The good combination of SMIT and SMID parallelization outperforms the conventional art of concurrency, which enables us process a few terabyte PCAP file with the reasonable computing time.  For example, Asura can execute the anomaly detection of about 3,000,000,000 packets in around 800-1000 minutes (which is feasible for daily cron operation). Asura has two transformation combos (Pthreads→TBB, TBB→Thrust) for achieving drastically faster flow aggregation, feature vector extraction and clustering. SM
-</pre>
 
 1.Lisence: Asura 17 is now released as open source under MIT license. 
 
