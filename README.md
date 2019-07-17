@@ -34,7 +34,7 @@ https://github.com/RuoAndo/Asura/tree/master/1
 
 <img src="asura17.jpeg" width=200 height=200>
 
-A GPU acclerated packets cluctering using highly concurrent container
+A GPU acclerated packets cluctering using highly concurrent container<br> 
 https://github.com/RuoAndo/Asura/tree/master/17
 <br><br>
 
