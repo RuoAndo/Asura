@@ -37,8 +37,6 @@ The rapid increase of security log has been imposing a great burden on security 
 <pre>
 	Container: typedef tbb::concurrent_vector<unsigned long long> iTbb_Vec1; iTbb_Vec1 TbbVec1;
 		   typedef tbb::concurrent_vector<long> iTbb_Vec2; iTbb_Vec2 TbbVec2;
-
-typedef concurrent_hash_map<unsigned long long, int, HashCompare>
 </pre>
 
 <pre>
