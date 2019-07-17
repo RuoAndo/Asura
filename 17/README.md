@@ -35,7 +35,11 @@ The rapid increase of security log has been imposing a great burden on security 
 
 6.Procedure 1: extracting flow vector {<srcIP, dstIP>, X, Y}
 <pre>
-	Container: typedef concurrent_hash_map<unsigned long long, int, HashCompare>
+	Container: typedef tbb::concurrent_vector<unsigned long long> iTbb_Vec1; iTbb_Vec1 TbbVec1;
+		   typedef tbb::concurrent_vector<long> iTbb_Vec2;
+iTbb_Vec2 TbbVec2;
+
+typedef concurrent_hash_map<unsigned long long, int, HashCompare>
 </pre>
 
 <pre>
@@ -48,23 +52,7 @@ The rapid increase of security log has been imposing a great burden on security 
  	       pthread_join(worker[i], NULL);
 </pre>
 
-7.Procedure 2: calculating anomaly score {<srcIP, dstIP>, Anomaly_Score}
-<pre>
-	  Main loop (K-Means):
-	  tbb::parallel_for(
-          tbb::blocked_range<size_t>(0,n),
-          [=,&tls,&global]( tbb::blocked_range<size_t> r ) {
-              view& v = tls.local();
-              for( size_t i=r.begin(); i!=r.end(); ++i ) {
-                  cluster_id j = calc_shortest_index(centroid, k , points[i]); 
-                  if( j!=id[i] ) {
-                      id[i] = j;
-                      ++v.change;
-                  }
-                  v.array[j].tally(points[i]);
-              }
-            }
-</pre>
+<img src="asura17-procs.jpeg" width=200 height=200>
 
-8. Processing time: about 30 minutes for about 400,000,000 packets
+
 

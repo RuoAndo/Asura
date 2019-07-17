@@ -38,8 +38,6 @@ A GPU acclerated packets cluctering using highly concurrent container<br>
 https://github.com/RuoAndo/Asura/tree/master/17
 <br><br>
 
-<b>Asura 1(with Intel TBB)</b>
-
 <pre>
 0: original - DEFCON 26
 1: concurrent hash map (Intel TBB)
