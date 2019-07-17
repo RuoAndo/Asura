@@ -5,7 +5,7 @@ PLAN1(2018.10-2018.11): Cocurrent hash map (Intel TBB) is going to be adopted.
 <br>
 PLAN2(2019.02-2019.03): NVidia Cuda Thrust is going to be adopted.
 <br>
-PLAN3(2019.04-2019.06): NVLink is going to be adopted.
+PLAN3(2019.04-): NVLink is going to be adopted.
 
 <b>DEFCON 26 Demo</b>
 
@@ -41,11 +41,5 @@ https://github.com/RuoAndo/Asura/tree/master/17
 <pre>
 0: original - DEFCON 26
 1: concurrent hash map (Intel TBB)
-14: 
-15: 
-16: 
 17: concurrent vector (Intel TBB) and CUDA Thrust
-18:
-19:
-20: 
 </pre>
