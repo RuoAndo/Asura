@@ -51,7 +51,7 @@ typedef concurrent_hash_map<unsigned long long, int, HashCompare>
  	       pthread_join(worker[i], NULL);
 </pre>
 
-<img src="asura17-procs.jpg" width=400 height=400>
+<img src="asura17-procs.jpg">
 
 
 
