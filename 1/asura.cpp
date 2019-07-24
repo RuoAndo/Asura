@@ -745,11 +745,6 @@ int main(int argc, char* argv[]) {
     pthread_t worker2[thread_num];
     int cpu_num;
 
-    /*
-    map<string, string> myAddrPair;
-    int map_counter = 0;
-    */    
-
     if (argc != 2) {
         printf("Usage: ./asura [DIR] \n"); return 0;
     }
@@ -896,10 +891,6 @@ int main(int argc, char* argv[]) {
 
 	    outputfile4 << ip1_bset.to_ulong() << "." << ip2_bset.to_ulong() << "." << ip3_bset.to_ulong() << "." << ip4_bset.to_ulong() << ",";
 
-	    /*
-	    std::cout << ip1_bset.to_ulong() << "." << ip2_bset.to_ulong() << "." << ip3_bset.to_ulong() << "." << ip4_bset.to_ulong() << ",";
-	    */	    
-
 	    std::string ip5 = bset_pair_string.substr(32, 8);
 	    std::string ip6 = bset_pair_string.substr(40, 8);
 	    std::string ip7 = bset_pair_string.substr(48, 8);
@@ -912,18 +903,10 @@ int main(int argc, char* argv[]) {
 
 	    outputfile4 << ip5_bset.to_ulong() << "." << ip6_bset.to_ulong() << "." << ip7_bset.to_ulong() << "." << ip8_bset.to_ulong() << " -> ";
 
-	    /*
-	    std::cout << ip5_bset.to_ulong() << "." << ip6_bset.to_ulong() << "." << ip7_bset.to_ulong() << "." << ip8_bset.to_ulong() << " -> ";
-	    */
-
 	    float percent = (float)counts[id[i]]/(float)M;
-	    // printf("%d (%g %g) counts %d / %d [%f%] \n",id[i],points[i].x, points[i].y, counts[id[i]], M, percent);
-
-	    // outputfile4 << id[i] << " (" << points[i].x << "," << points[i].y << ")," << counts[id[i]] << "," << M << "," << percent << "%" << endl;
 
 	    outputfile4 << id[i] << " (" << points[i].x << "," << points[i].y << ")," << counts[id[i]] << "," << M << "," << percent << endl;
-	    
-	
+	    	
     }
 
     outputfile4.close();
