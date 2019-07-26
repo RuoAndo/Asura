@@ -49,7 +49,50 @@ The rapid increase of security log has been imposing a great burden on security 
  	       pthread_join(worker[i], NULL);
 </pre>
 
+Insertion point of concurrent vector is located at ProcIpHeader.
+
 <img src="asura17-procs.jpg">
 
+<pre>
+355: int ProcIpHeader(struct iphdr *iphdr,u_char *option,int optionLen,FILE *fp,u_char*ptr)
+415:  unsigned long long n = bitset<64>(IPstring).to_ullong();
+416:  TbbVec1.push_back(n);
+417:  TbbVec2.push_back(tlen);
+</pre>
 
+The containers are written to the file of "tmp-asura-1" and "tmp-asura-2".
 
+<pre>
+805    std::remove("tmp-asura-1");                                                                                        
+806    ofstream outputfile1("tmp-asura-1");                                                                               
+807                                                                                                                       
+808    std::remove("tmp-asura-2");                                                                                        
+809    ofstream outputfile2("tmp-asura-2");                                                                               
+810                                                                                                                       
+811    tbb::concurrent_vector<unsigned long long>::iterator start1;                                                       
+812    tbb::concurrent_vector<unsigned long long>::iterator end1 = TbbVec1.end();                                         
+813                                                                                                                       
+814    tbb::concurrent_vector<long>::iterator start2;                                                                     
+815    tbb::concurrent_vector<long>::iterator end2 = TbbVec2.end();                                                       
+816                                                                                                                       
+817    // counter = 0;                            
+818                                                                                                                       
+819    for(start1 = TbbVec1.begin();start1 != end1;++start1)                                                              
+820      {                                                                                                                
+821        unsigned long long s = (unsigned long long)*start1;                                                            
+822        outputfile1 << s << "," << "1" << endl;                                                                        
+823      }                                                                                                                
+824                                                                                                                       
+825    start2 = TbbVec2.begin();                                                                                          
+826    for(start1 = TbbVec1.begin();start1 != end1;++start1)                                                              
+827      {                                                                                                                
+828        unsigned long long s = (unsigned long long)*start1;                                                            
+829        long t = (unsigned long long)*start2;                                                                          
+830                                                                                                                       
+831        outputfile2 << s << "," << t << endl;     
+832        start2++;                                                                                                      
+833      }                                                                                                                
+834                                                                                                                       
+835    outputfile1.close();                                                                                               
+836    outputfile2.close();    
+</pre>
