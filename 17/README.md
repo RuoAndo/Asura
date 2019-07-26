@@ -49,7 +49,48 @@ The rapid increase of security log has been imposing a great burden on security 
  	       pthread_join(worker[i], NULL);
 </pre>
 
+Insertion point of concurrent vector is located at ProcIpHeader.
+
 <img src="asura17-procs.jpg">
 
+<pre>
+355: int ProcIpHeader(struct iphdr *iphdr,u_char *option,int optionLen,FILE *fp,u_char*ptr)
+415:  unsigned long long n = bitset<64>(IPstring).to_ullong();
+416:  TbbVec1.push_back(n);
+417:  TbbVec2.push_back(tlen);
+</pre>
 
+<pre>
+    std::remove("tmp-asura-1");
+    ofstream outputfile1("tmp-asura-1");
 
+    std::remove("tmp-asura-2");
+    ofstream outputfile2("tmp-asura-2");
+
+    tbb::concurrent_vector<unsigned long long>::iterator start1;
+    tbb::concurrent_vector<unsigned long long>::iterator end1 = TbbVec1.end();
+
+    tbb::concurrent_vector<long>::iterator start2;
+    tbb::concurrent_vector<long>::iterator end2 = TbbVec2.end();
+    
+    // counter = 0;
+    
+    for(start1 = TbbVec1.begin();start1 != end1;++start1)
+      {
+	unsigned long long s = (unsigned long long)*start1;
+	outputfile1 << s << "," << "1" << endl;
+      }
+
+    start2 = TbbVec2.begin();
+    for(start1 = TbbVec1.begin();start1 != end1;++start1)
+      {
+	unsigned long long s = (unsigned long long)*start1;
+	long t = (unsigned long long)*start2;
+	
+	outputfile2 << s << "," << t << endl;
+	start2++;
+      }
+
+    outputfile1.close();
+    outputfile2.close();
+</pre>
