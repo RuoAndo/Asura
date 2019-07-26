@@ -60,6 +60,8 @@ Insertion point of concurrent vector is located at ProcIpHeader.
 417:  TbbVec2.push_back(tlen);
 </pre>
 
+The containers are written to the file of "tmp-asura-1" and "tmp-asura-2".
+
 <pre>
 805    std::remove("tmp-asura-1");                                                                                        
 806    ofstream outputfile1("tmp-asura-1");                                                                               
