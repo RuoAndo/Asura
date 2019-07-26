@@ -55,7 +55,7 @@
 using namespace std;
 using namespace tbb;
 
-#define N 100
+#define N 3
 #define WORKER_THREAD_NUM N
 #define MAX_QUEUE_NUM N
 #define END_MARK_FNAME   "///"
@@ -91,34 +91,31 @@ struct HashCompare {
     }
 };
 
-typedef concurrent_hash_map<std::string, std::string> CharTable;
+/*
+typedef concurrent_hash_map<unsigned long long, int> CharTable;
 static CharTable table;
 
 typedef concurrent_hash_map<unsigned long long, int> CharTable2;
 static CharTable2 table2;
-
-typedef concurrent_hash_map<unsigned long long, int> CharTable3;
-static CharTable3 table3;
-
-typedef concurrent_hash_map<unsigned long long, long> CharTable4;
-static CharTable4 table4;
 */
 
-/*
-typedef concurrent_hash_map<unsigned long long, int, HashCompare> CharTable2;
-static CharTable2 table2;
-
-typedef concurrent_hash_map<unsigned long long, int, HashCompare> CharTable3;
-static CharTable3 table3;
-
-typedef concurrent_hash_map<unsigned long long, long, HashCompare> CharTable4;
-static CharTable4 table4;
-*/
+extern void transfer(unsigned long long *key, long *value, unsigned long long *key_out, long *value_out, int kBytes, int vBytes, size_t data_size, int* new_size, int thread_id);    
 
 typedef tbb::concurrent_vector<unsigned long long> iTbb_Vec1;
-iTbb_Vec1 TbbVec1;
 typedef tbb::concurrent_vector<long> iTbb_Vec2;
-iTbb_Vec2 TbbVec2;
+
+iTbb_Vec1 TbbVec1_thread_1;
+iTbb_Vec2 TbbVec2_thread_1;
+
+iTbb_Vec1 TbbVec1_thread_2;
+iTbb_Vec2 TbbVec2_thread_2;
+
+iTbb_Vec1 TbbVec1_thread_3;
+iTbb_Vec2 TbbVec2_thread_3;
+
+
+typedef tbb::concurrent_hash_map<long, int> iTbb_Vec_timestamp;
+static iTbb_Vec_timestamp TbbVec_timestamp; 
 
 /* reduced */
 typedef struct _reduced {
@@ -352,7 +349,7 @@ std::vector<std::string> split_string_2(std::string str, char del) {
   return result;
 }
 
-int ProcIpHeader(struct iphdr *iphdr,u_char *option,int optionLen,FILE *fp,u_char*ptr)
+int ProcIpHeader(struct iphdr *iphdr,u_char *option,int optionLen,FILE *fp,u_char*ptr,int thread_id)
 {
   int i;
   char buf[80];
@@ -367,9 +364,6 @@ int ProcIpHeader(struct iphdr *iphdr,u_char *option,int optionLen,FILE *fp,u_cha
 
   struct tcphdr *tcp;
   struct udphdr *udp;
-
-  // u_char*ptr;
-  // ptr = iphadr;
   
   /*
   fprintf(fp,"protocol=%u, ",iphdr->protocol);
@@ -413,19 +407,25 @@ int ProcIpHeader(struct iphdr *iphdr,u_char *option,int optionLen,FILE *fp,u_cha
   }
 	  
   unsigned long long n = bitset<64>(IPstring).to_ullong();
-  TbbVec1.push_back(n);
-  TbbVec2.push_back(tlen);
-  
-  /*
-  CharTable2::accessor a2;
-  table2.insert(a2, n);
-  a2->second = +tlen;     
 
-  CharTable3::accessor a3;
-  table3.insert(a3, n);
-  a3->second += 1;     
-  */
+  if(thread_id == 1)
+    {  
+      TbbVec1_thread_1.push_back(n);
+      TbbVec2_thread_1.push_back(tlen);  
+    }
 
+  if(thread_id == 2)
+    {  
+      TbbVec1_thread_2.push_back(n);
+      TbbVec2_thread_2.push_back(tlen);  
+    }
+
+  if(thread_id == 3)
+    {  
+      TbbVec1_thread_3.push_back(n);
+      TbbVec2_thread_3.push_back(tlen);  
+    }
+      
   if(iphdr->protocol == IPPROTO_TCP)
     {
       tcp = (struct tcphdr *) ptr;
@@ -433,18 +433,12 @@ int ProcIpHeader(struct iphdr *iphdr,u_char *option,int optionLen,FILE *fp,u_cha
 
       sport = ntohs(tcp->th_sport);
       dport = ntohs(tcp->th_dport);
-
-      /*
-      CharTable4::accessor a4;
-      table4.insert(a4, n);
-      a4->second += sport;     
-      */
     }
   
   return(0);
 }
 
-int AnalyzeIp(u_char *data,int size)
+int AnalyzeIp(u_char *data, int size, int thread_id)
 {
   u_char*ptr;
   int lest;
@@ -482,7 +476,7 @@ int AnalyzeIp(u_char *data,int size)
     chksum++;
   }
   
-  ProcIpHeader(iphdr,option,optionLen,stdout,ptr);
+  ProcIpHeader(iphdr,option,optionLen,stdout,ptr,thread_id);
   
   return(0);
 }
@@ -545,7 +539,7 @@ int traverse_file(char* filename, char* srchstr, int thread_id) {
 		  if (fgets(buf, sizeof(struct iphdr)+8, fp) != NULL)
 		    {
 		      ptr = buf;
-		      AnalyzeIp(ptr,sizeof(struct iphdr));
+		      AnalyzeIp(ptr, sizeof(struct iphdr), thread_id);
 		      counter = counter + 1;
 		    }
 		  fseek(fp,-3L,SEEK_CUR);
@@ -558,6 +552,7 @@ int traverse_file(char* filename, char* srchstr, int thread_id) {
     } // for (;;)
 
     fclose(fp);
+
     return sumn;
 }
 
@@ -743,6 +738,212 @@ void worker_func(thread_arg_t* arg) {
     return;
 }
 
+
+void worker_func_2(thread_arg_t* arg) {
+    int flen;
+    char* fname = NULL;
+    queue_t* q = arg->q;
+    char* srchstr = arg->srchstr;
+
+    int thread_id = arg->id;
+    int counter = 0;
+
+    unsigned int t, travdirtime; 
+    
+    printf("worker func_2 %d launched \n", thread_id);
+
+    if(thread_id == 1)
+      {
+	std::cout << "Thread1: TbbVec1 size:" << TbbVec1_thread_1.size() << endl;
+	std::cout << "Thread1: TbbVec2 size:" << TbbVec2_thread_1.size() << endl;
+
+	size_t kBytes = TbbVec1_thread_1.size() * sizeof(unsigned long long);
+	unsigned long long *key;
+	key = (unsigned long long *)malloc(kBytes);
+
+	size_t vBytes = TbbVec1_thread_1.size() * sizeof(long);
+	long *value;
+	value = (long *)malloc(vBytes);
+
+	unsigned long long *key_out;
+	key_out = (unsigned long long *)malloc(kBytes);
+    
+	long *value_out;
+	value_out = (long *)malloc(vBytes);
+
+	int new_size = 0;
+    	
+	tbb::concurrent_vector<unsigned long long>::iterator start1;
+	tbb::concurrent_vector<unsigned long long>::iterator end1 = TbbVec1_thread_1.end();
+
+	tbb::concurrent_vector<long>::iterator start2;
+	tbb::concurrent_vector<long>::iterator end2 = TbbVec2_thread_1.end();
+
+	for(start1 = TbbVec1_thread_1.begin();start1 != end1;++start1)
+	  {
+	    unsigned long long s = (unsigned long long)*start1;
+	  }
+
+	counter = 0;
+	start2 = TbbVec2_thread_1.begin();
+	for(start1 = TbbVec1_thread_1.begin();start1 != end1;++start1)
+	  {
+	    unsigned long long s = (unsigned long long)*start1;
+	    long v = (unsigned long long)*start2;
+	    
+	    key[counter] = s;
+	    value[counter] = v;
+
+	    counter++;
+	    start2++;
+	  }
+
+	cout << "thread:" << thread_id << ":" << TbbVec1_thread_1.size() << " lines - read done." << endl;
+
+	start_timer(&t);
+	cout << "transfer..." << endl;
+	transfer(key, value, key_out, value_out, kBytes, vBytes, TbbVec1_thread_1.size(), &new_size, thread_id);
+	cout << "done." << endl;
+	travdirtime = stop_timer(&t);
+	print_timer(travdirtime);
+	
+	for(int i = 0; i < new_size; i++)
+	  {
+	    iTbb_Vec_timestamp::accessor tms;
+	    TbbVec_timestamp.insert(tms, key_out[i]);
+	    tms->second += value_out[i];
+	  }       
+      }
+
+    if(thread_id == 2)
+      {
+	std::cout << "Thread2: TbbVec1 size:" << TbbVec1_thread_2.size() << endl;
+	std::cout << "Thread2: TbbVec2 size:" << TbbVec2_thread_2.size() << endl;
+
+	size_t kBytes = TbbVec1_thread_2.size() * sizeof(unsigned long long);
+	unsigned long long *key;
+	key = (unsigned long long *)malloc(kBytes);
+
+	size_t vBytes = TbbVec1_thread_2.size() * sizeof(long);
+	long *value;
+	value = (long *)malloc(vBytes);
+
+	unsigned long long *key_out;
+	key_out = (unsigned long long *)malloc(kBytes);
+    
+	long *value_out;
+	value_out = (long *)malloc(vBytes);
+
+	int new_size = 0;
+    	
+	tbb::concurrent_vector<unsigned long long>::iterator start1;
+	tbb::concurrent_vector<unsigned long long>::iterator end1 = TbbVec1_thread_2.end();
+
+	tbb::concurrent_vector<long>::iterator start2;
+	tbb::concurrent_vector<long>::iterator end2 = TbbVec2_thread_2.end();
+
+	for(start1 = TbbVec1_thread_2.begin();start1 != end1;++start1)
+	  {
+	    unsigned long long s = (unsigned long long)*start1;
+	  }
+
+	counter = 0;
+	start2 = TbbVec2_thread_2.begin();
+	for(start1 = TbbVec1_thread_2.begin();start1 != end1;++start1)
+	  {
+	    unsigned long long s = (unsigned long long)*start1;
+	    long t = (unsigned long long)*start2;
+	    
+	    key[counter] = s;
+	    value[counter] = t;
+
+	    counter++;
+	    start2++;
+	  }
+
+	cout << "thread:" << thread_id << ":" << TbbVec1_thread_2.size() << " lines - read done." << endl;
+
+	start_timer(&t);
+	cout << "transfer..." << endl;
+	transfer(key, value, key_out, value_out, kBytes, vBytes, TbbVec1_thread_2.size(), &new_size, thread_id);
+	cout << "done." << endl;
+	travdirtime = stop_timer(&t);
+	print_timer(travdirtime);
+	
+	for(int i = 0; i < new_size; i++)
+	  {
+	    iTbb_Vec_timestamp::accessor tms;
+	    TbbVec_timestamp.insert(tms, key_out[i]);
+	    tms->second += value_out[i];
+	  }       
+      }
+    
+    if(thread_id == 3)
+      {
+	std::cout << "Thread3: TbbVec1 size:" << TbbVec1_thread_3.size() << endl;
+	std::cout << "Thread3: TbbVec2 size:" << TbbVec2_thread_3.size() << endl;
+
+	size_t kBytes = TbbVec1_thread_3.size() * sizeof(unsigned long long);
+	unsigned long long *key;
+	key = (unsigned long long *)malloc(kBytes);
+
+	size_t vBytes = TbbVec1_thread_3.size() * sizeof(long);
+	long *value;
+	value = (long *)malloc(vBytes);
+
+	unsigned long long *key_out;
+	key_out = (unsigned long long *)malloc(kBytes);
+    
+	long *value_out;
+	value_out = (long *)malloc(vBytes);
+
+	int new_size = 0;
+    	
+	tbb::concurrent_vector<unsigned long long>::iterator start1;
+	tbb::concurrent_vector<unsigned long long>::iterator end1 = TbbVec1_thread_3.end();
+
+	tbb::concurrent_vector<long>::iterator start2;
+	tbb::concurrent_vector<long>::iterator end2 = TbbVec2_thread_3.end();
+
+	for(start1 = TbbVec1_thread_3.begin();start1 != end1;++start1)
+	  {
+	    unsigned long long s = (unsigned long long)*start1;
+	  }
+
+	counter = 0;
+	start2 = TbbVec2_thread_3.begin();
+	for(start1 = TbbVec1_thread_3.begin();start1 != end1;++start1)
+	  {
+	    unsigned long long s = (unsigned long long)*start1;
+	    long t = (unsigned long long)*start2;
+	    
+	    key[counter] = s;
+	    value[counter] = t;
+
+	    counter++;
+	    start2++;
+	  }
+
+	cout << "thread:" << thread_id << ":" << TbbVec1_thread_3.size() << " lines - read done." << endl;
+
+	start_timer(&t);
+	cout << "transfer..." << endl;
+	transfer(key, value, key_out, value_out, kBytes, vBytes, TbbVec1_thread_3.size(), &new_size, thread_id);
+	cout << "done." << endl;
+	travdirtime = stop_timer(&t);
+	print_timer(travdirtime);
+	
+	for(int i = 0; i < new_size; i++)
+	  {
+	    iTbb_Vec_timestamp::accessor tms;
+	    TbbVec_timestamp.insert(tms, key_out[i]);
+	    tms->second += value_out[i];
+	  }       
+      }
+
+    return;
+}
+
 void print_result(thread_arg_t* arg) {
     if (result.num) {
         printf("Total %d files\n", arg->filenum);
@@ -761,6 +962,8 @@ int main(int argc, char* argv[]) {
     pthread_t worker[thread_num];
     pthread_t worker2[thread_num];
     int cpu_num;
+
+    int counter = 0;
     
     /*
     map<string, string> myAddrPair;
@@ -786,7 +989,7 @@ int main(int argc, char* argv[]) {
 
     pthread_mutex_init(&result.mutex, NULL);
 
-    /* first scatter */
+    /* first stage */
     
     pthread_create(&master, NULL, (void*)master_func, (void*)&targ[0]);
     for (i = 1; i < thread_num; ++i)
@@ -797,69 +1000,29 @@ int main(int argc, char* argv[]) {
     for (i = 1; i < thread_num; ++i) 
         pthread_join(worker[i], NULL);
 
-    int counter = 0;
-
-    std::cout << "TbbVec1 size:" << TbbVec1.size() << endl;
-    std::cout << "TbbVec2 size:" << TbbVec2.size() << endl;
+    /* second stage */
     
-    std::remove("tmp-asura-1");
-    ofstream outputfile1("tmp-asura-1");
-
-    std::remove("tmp-asura-2");
-    ofstream outputfile2("tmp-asura-2");
-
-    tbb::concurrent_vector<unsigned long long>::iterator start1;
-    tbb::concurrent_vector<unsigned long long>::iterator end1 = TbbVec1.end();
-
-    tbb::concurrent_vector<long>::iterator start2;
-    tbb::concurrent_vector<long>::iterator end2 = TbbVec2.end();
-    
-    // counter = 0;
-    
-    for(start1 = TbbVec1.begin();start1 != end1;++start1)
-      {
-	unsigned long long s = (unsigned long long)*start1;
-	outputfile1 << s << "," << "1" << endl;
+    for (i = 1; i < thread_num; ++i)
+      { 
+        targ[i].id = i;
+        pthread_create(&worker[i], NULL, (void*)worker_func_2, (void*)&targ[i]);
       }
+    for (i = 1; i < thread_num; ++i) 
+        pthread_join(worker[i], NULL);
 
-    start2 = TbbVec2.begin();
-    for(start1 = TbbVec1.begin();start1 != end1;++start1)
-      {
-	unsigned long long s = (unsigned long long)*start1;
-	long t = (unsigned long long)*start2;
-	
-	outputfile2 << s << "," << t << endl;
-	start2++;
-      }
-
-    outputfile1.close();
-    outputfile2.close();
-
-    /*
-    thrust::sort(k_in, k_in + TbbVec.size());
-
-    auto new_end = thrust::reduce_by_key(k_in,
-					 k_in + TbbVec.size(),
-					 v_in,
-					 k_out,
-					 v_out);
-
-    long new_size = new_end.first - k_out;
+    cout << "all - done." << endl;
     
     counter = 0;
-    for(int i=0; i < new_size; i++)
+    for(  iTbb_Vec_timestamp::iterator i=TbbVec_timestamp.begin(); i!=TbbVec_timestamp.end(); ++i )
       {
-	outputfile << k_out[counter] << "," <<  v_out[counter] << endl;
+
+	cout << (unsigned long long)i->first << "," << (long)i->second << endl;
+
+	if(counter > 20)
+	  break;
+	
 	counter = counter + 1;
-      }
-
-    outputfile.close();
-    */    
-
-    /*
-    std::remove("tmp3");
-    ofstream outputfile3("tmp3");
-    */
+      }                
 
     return 0;
 }
