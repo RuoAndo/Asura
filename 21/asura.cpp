@@ -55,8 +55,8 @@
 using namespace std;
 using namespace tbb;
 
-#define N 20
-#define WORKER_THREAD_NUM_PHASE1 22
+#define N 22
+#define WORKER_THREAD_NUM_PHASE1 20
 #define WORKER_THREAD_NUM_PHASE2 3
 
 #define MAX_QUEUE_NUM N
@@ -95,10 +95,10 @@ iTbb_Vec2 TbbVec2_thread_2;
 iTbb_Vec1 TbbVec1_thread_3;
 iTbb_Vec2 TbbVec2_thread_3;
 
-typedef tbb::concurrent_hash_map<long, int> iTbb_Vec_bytes;
+typedef tbb::concurrent_hash_map<unsigned long, int, HashCompare> iTbb_Vec_bytes;
 static iTbb_Vec_bytes TbbVec_bytes; 
 
-typedef tbb::concurrent_hash_map<long, int> iTbb_Vec_counts;
+typedef tbb::concurrent_hash_map<unsigned long, int, HashCompare> iTbb_Vec_counts;
 static iTbb_Vec_counts TbbVec_counts; 
 
 /* reduced */
@@ -945,7 +945,6 @@ void worker_func_2(thread_arg_t* arg) {
 	    TbbVec_counts.insert(tcnt, key_out[i]);
 	    tcnt->second++;
 	  }       
-
       }
 
     return;
@@ -969,6 +968,9 @@ int main(int argc, char* argv[]) {
     int cpu_num;
 
     int counter = 0;
+
+    struct in_addr inaddr;
+    char *some_addr;
     
     if (argc != 2) {
         printf("Usage: ./asura [DIR] \n"); return 0;
@@ -1027,26 +1029,82 @@ int main(int argc, char* argv[]) {
 
     cout << "all - done." << endl;
 
-    /*
-    typedef tbb::concurrent_hash_map<long, int> iTbb_Vec_bytes;
-    static iTbb_Vec_bytes TbbVec_bytes; 
-    */    
-
+    std::remove("tmp-asura-1");
+    ofstream outputfile1("tmp-asura-1");
     
     counter = 0;
-    // iTbb_Vec_counts::iterator j=TbbVec_counts.begin();
+    cout << "TbbVec_bytes size: " << TbbVec_bytes.size() << endl;
+    
     for(  iTbb_Vec_bytes::iterator i=TbbVec_bytes.begin(); i!=TbbVec_bytes.end(); ++i )
       {
 
-	// cout << (unsigned long long)i->first << "," << (long)i->second << "," << (long)j->second << endl;
-	cout << (unsigned long long)i->first << "," << (long)i->second << endl;
+	bitset<64> addr((unsigned long long)i->first);
+	std::string addr_string = addr.to_string();
+	string addr_src = addr_string.substr(0,32);
+	string addr_dst = addr_string.substr(32,32);
 
-	if(counter > 20)
-	  break;
+	bitset<32> bs(addr_src);
+	bitset<32> ds(addr_dst);
+	unsigned long long int s = bs.to_ullong();
+	unsigned long long int d = ds.to_ullong();
 
-	// j++;
+	inaddr = { htonl(s) };
+	some_addr = inet_ntoa(inaddr);
+	string src_string = string(some_addr);   
+	
+	inaddr = { htonl(d) };
+	some_addr = inet_ntoa(inaddr);
+	string dst_string = string(some_addr);
+
+	outputfile1 << src_string << "," << dst_string << "," << (long)i->second << endl; 
+	// outputfile1 << (unsigned long long)i->first << "," << (long)i->second << endl;;
+
+	/*
+	if(counter > 10)
+	  cout << src_string << "," << dst_string << "," << (long)i->second << endl; 
+	*/       
+
 	counter = counter + 1;
-      }                
+      }
+
+    outputfile1.close();
+
+    std::remove("tmp-asura-2");
+    ofstream outputfile2("tmp-asura-2");
+
+    cout << "TbbVec_counts size: " << TbbVec_counts.size() << endl;
+    
+    counter = 0;
+    for(  iTbb_Vec_counts::iterator i=TbbVec_counts.begin(); i!=TbbVec_counts.end(); ++i )
+      {
+
+	bitset<64> addr((unsigned long long)i->first);
+	std::string addr_string = addr.to_string();
+	string addr_src = addr_string.substr(0,32);
+	string addr_dst = addr_string.substr(32,32);
+
+	bitset<32> bs(addr_src);
+	bitset<32> ds(addr_dst);
+	unsigned long long int s = bs.to_ullong();
+	unsigned long long int d = ds.to_ullong();
+
+	inaddr = { htonl(s) };
+	some_addr = inet_ntoa(inaddr);
+	string src_string = string(some_addr);   
+	
+	inaddr = { htonl(d) };
+	some_addr = inet_ntoa(inaddr);
+	string dst_string = string(some_addr);
+
+	outputfile2 << src_string << "," << dst_string << "," << (long)i->second << endl; 
+
+	if(counter < 10)
+	  cout << src_string << "," << dst_string << "," << (long)i->second << endl; 
+    
+	counter = counter + 1;
+      }
+
+    outputfile2.close();
 
     return 0;
 }
