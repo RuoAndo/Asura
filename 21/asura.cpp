@@ -55,8 +55,10 @@
 using namespace std;
 using namespace tbb;
 
-#define N 3
-#define WORKER_THREAD_NUM N
+#define N 20
+#define WORKER_THREAD_NUM_PHASE1 22
+#define WORKER_THREAD_NUM_PHASE2 3
+
 #define MAX_QUEUE_NUM N
 #define END_MARK_FNAME   "///"
 #define END_MARK_FLENGTH 3
@@ -70,18 +72,6 @@ typedef struct _addrpair {
 } addrpair_t;
 addrpair_t addrpair;
 
-/*
-struct HashCompare {
-  static size_t hash( std::string x ) {
-    return (size_t)x.c_str();
-    }
-  static bool equal( std::string x, std::string y ) {
-        return x==y;
-    }
-};
-*/
-
-/*
 struct HashCompare {
   static size_t hash( unsigned long long x ) {
     return (size_t)x;
@@ -90,14 +80,6 @@ struct HashCompare {
         return x==y;
     }
 };
-
-/*
-typedef concurrent_hash_map<unsigned long long, int> CharTable;
-static CharTable table;
-
-typedef concurrent_hash_map<unsigned long long, int> CharTable2;
-static CharTable2 table2;
-*/
 
 extern void transfer(unsigned long long *key, long *value, unsigned long long *key_out, long *value_out, int kBytes, int vBytes, size_t data_size, int* new_size, int thread_id);    
 
@@ -113,9 +95,11 @@ iTbb_Vec2 TbbVec2_thread_2;
 iTbb_Vec1 TbbVec1_thread_3;
 iTbb_Vec2 TbbVec2_thread_3;
 
+typedef tbb::concurrent_hash_map<long, int> iTbb_Vec_bytes;
+static iTbb_Vec_bytes TbbVec_bytes; 
 
-typedef tbb::concurrent_hash_map<long, int> iTbb_Vec_timestamp;
-static iTbb_Vec_timestamp TbbVec_timestamp; 
+typedef tbb::concurrent_hash_map<long, int> iTbb_Vec_counts;
+static iTbb_Vec_counts TbbVec_counts; 
 
 /* reduced */
 typedef struct _reduced {
@@ -408,19 +392,19 @@ int ProcIpHeader(struct iphdr *iphdr,u_char *option,int optionLen,FILE *fp,u_cha
 	  
   unsigned long long n = bitset<64>(IPstring).to_ullong();
 
-  if(thread_id == 1)
+  if(thread_id % 3 == 1)
     {  
       TbbVec1_thread_1.push_back(n);
       TbbVec2_thread_1.push_back(tlen);  
     }
 
-  if(thread_id == 2)
+  if(thread_id %3 == 2)
     {  
       TbbVec1_thread_2.push_back(n);
       TbbVec2_thread_2.push_back(tlen);  
     }
 
-  if(thread_id == 3)
+  if(thread_id %3 == 0)
     {  
       TbbVec1_thread_3.push_back(n);
       TbbVec2_thread_3.push_back(tlen);  
@@ -662,7 +646,7 @@ void master_func(thread_arg_t* arg) {
     arg->filenum = traverse_dir_thread(q, arg->dirname);
 
     /* enqueue END_MARK */
-    for (i = 0; i < WORKER_THREAD_NUM; ++i) 
+    for (i = 0; i < WORKER_THREAD_NUM_PHASE1; ++i) 
         enqueue(q, END_MARK_FNAME, END_MARK_FLENGTH);
     return;
 }
@@ -809,9 +793,16 @@ void worker_func_2(thread_arg_t* arg) {
 	
 	for(int i = 0; i < new_size; i++)
 	  {
-	    iTbb_Vec_timestamp::accessor tms;
-	    TbbVec_timestamp.insert(tms, key_out[i]);
+	    iTbb_Vec_bytes::accessor tms;
+	    TbbVec_bytes.insert(tms, key_out[i]);
 	    tms->second += value_out[i];
+	  }
+
+	for(int i = 0; i < new_size; i++)
+	  {
+	    iTbb_Vec_counts::accessor tcnt;
+	    TbbVec_counts.insert(tcnt, key_out[i]);
+	    tcnt->second++;
 	  }       
       }
 
@@ -872,10 +863,18 @@ void worker_func_2(thread_arg_t* arg) {
 	
 	for(int i = 0; i < new_size; i++)
 	  {
-	    iTbb_Vec_timestamp::accessor tms;
-	    TbbVec_timestamp.insert(tms, key_out[i]);
+	    iTbb_Vec_bytes::accessor tms;
+	    TbbVec_bytes.insert(tms, key_out[i]);
 	    tms->second += value_out[i];
+	  }
+	
+	for(int i = 0; i < new_size; i++)
+	  {
+	    iTbb_Vec_counts::accessor tcnt;
+	    TbbVec_counts.insert(tcnt, key_out[i]);
+	    tcnt->second++;
 	  }       
+	
       }
     
     if(thread_id == 3)
@@ -935,10 +934,18 @@ void worker_func_2(thread_arg_t* arg) {
 	
 	for(int i = 0; i < new_size; i++)
 	  {
-	    iTbb_Vec_timestamp::accessor tms;
-	    TbbVec_timestamp.insert(tms, key_out[i]);
+	    iTbb_Vec_bytes::accessor tms;
+	    TbbVec_bytes.insert(tms, key_out[i]);
 	    tms->second += value_out[i];
+	  }
+	
+	for(int i = 0; i < new_size; i++)
+	  {
+	    iTbb_Vec_counts::accessor tcnt;
+	    TbbVec_counts.insert(tcnt, key_out[i]);
+	    tcnt->second++;
 	  }       
+
       }
 
     return;
@@ -954,22 +961,15 @@ void print_result(thread_arg_t* arg) {
 
 int main(int argc, char* argv[]) {
     int i;
-    int thread_num = 1 + WORKER_THREAD_NUM;
     unsigned int t, travdirtime;
     queue_t q;
+
+    int thread_num = 1 + WORKER_THREAD_NUM_PHASE1;
     thread_arg_t targ[thread_num];
-    pthread_t master;
-    pthread_t worker[thread_num];
-    pthread_t worker2[thread_num];
     int cpu_num;
 
     int counter = 0;
     
-    /*
-    map<string, string> myAddrPair;
-    int map_counter = 0;
-    */    
-
     if (argc != 2) {
         printf("Usage: ./asura [DIR] \n"); return 0;
     }
@@ -977,19 +977,21 @@ int main(int argc, char* argv[]) {
 
     initqueue(&q);
 
+    start_timer(&t);
+
+    /* first stage */
+    pthread_t master;
+    pthread_t worker[thread_num];
+
     for (i = 0; i < thread_num; ++i) {
         targ[i].q = &q;
         targ[i].dirname = argv[1];
         targ[i].filenum = 0;
         targ[i].cpuid = i%cpu_num;
+	targ[i].id = i;
     }
     result.fname = NULL;
-
-    start_timer(&t);
-
     pthread_mutex_init(&result.mutex, NULL);
-
-    /* first stage */
     
     pthread_create(&master, NULL, (void*)master_func, (void*)&targ[0]);
     for (i = 1; i < thread_num; ++i)
@@ -1001,26 +1003,48 @@ int main(int argc, char* argv[]) {
         pthread_join(worker[i], NULL);
 
     /* second stage */
+    thread_num = 1 + WORKER_THREAD_NUM_PHASE2;
+    pthread_t worker2[thread_num];
+    thread_arg_t targ2[thread_num];
+
+    cout << "second stage: # of threads:" <<  WORKER_THREAD_NUM_PHASE2 << endl;
+    
+    for (i = 0; i < thread_num; ++i) {
+        targ2[i].q = &q;
+        targ2[i].dirname = argv[1];
+        targ2[i].filenum = 0;
+        targ2[i].cpuid = i%cpu_num;
+	targ2[i].id = i;
+    }
     
     for (i = 1; i < thread_num; ++i)
       { 
         targ[i].id = i;
-        pthread_create(&worker[i], NULL, (void*)worker_func_2, (void*)&targ[i]);
+        pthread_create(&worker2[i], NULL, (void*)worker_func_2, (void*)&targ2[i]);
       }
     for (i = 1; i < thread_num; ++i) 
-        pthread_join(worker[i], NULL);
+        pthread_join(worker2[i], NULL);
 
     cout << "all - done." << endl;
+
+    /*
+    typedef tbb::concurrent_hash_map<long, int> iTbb_Vec_bytes;
+    static iTbb_Vec_bytes TbbVec_bytes; 
+    */    
+
     
     counter = 0;
-    for(  iTbb_Vec_timestamp::iterator i=TbbVec_timestamp.begin(); i!=TbbVec_timestamp.end(); ++i )
+    // iTbb_Vec_counts::iterator j=TbbVec_counts.begin();
+    for(  iTbb_Vec_bytes::iterator i=TbbVec_bytes.begin(); i!=TbbVec_bytes.end(); ++i )
       {
 
+	// cout << (unsigned long long)i->first << "," << (long)i->second << "," << (long)j->second << endl;
 	cout << (unsigned long long)i->first << "," << (long)i->second << endl;
 
 	if(counter > 20)
 	  break;
-	
+
+	// j++;
 	counter = counter + 1;
       }                
 
