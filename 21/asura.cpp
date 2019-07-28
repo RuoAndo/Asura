@@ -55,8 +55,8 @@
 using namespace std;
 using namespace tbb;
 
-#define N 22
-#define WORKER_THREAD_NUM_PHASE1 20
+#define N 10
+#define WORKER_THREAD_NUM_PHASE1 3
 #define WORKER_THREAD_NUM_PHASE2 3
 
 #define MAX_QUEUE_NUM N
@@ -99,7 +99,19 @@ typedef tbb::concurrent_hash_map<unsigned long, int, HashCompare> iTbb_Vec_bytes
 static iTbb_Vec_bytes TbbVec_bytes; 
 
 typedef tbb::concurrent_hash_map<unsigned long, int, HashCompare> iTbb_Vec_counts;
-static iTbb_Vec_counts TbbVec_counts; 
+static iTbb_Vec_counts TbbVec_counts;
+
+typedef tbb::concurrent_hash_map<unsigned long, std::vector<int>> iTbb_Vec_counts_thread_1;
+static iTbb_Vec_counts_thread_1 TbbVec_counts_thread_1;
+
+typedef tbb::concurrent_hash_map<unsigned long, std::vector<int>> iTbb_Vec_counts_thread_2;
+static iTbb_Vec_counts_thread_2 TbbVec_counts_thread_2;
+
+typedef tbb::concurrent_hash_map<unsigned long, std::vector<int>> iTbb_Vec_counts_thread_3;
+static iTbb_Vec_counts_thread_3 TbbVec_counts_thread_3;
+
+typedef tbb::concurrent_hash_map<unsigned long, std::vector<int>> iTbb_Vec_counts_thread_4;
+static iTbb_Vec_counts_thread_4 TbbVec_counts_thread_4; 
 
 /* reduced */
 typedef struct _reduced {
@@ -395,19 +407,33 @@ int ProcIpHeader(struct iphdr *iphdr,u_char *option,int optionLen,FILE *fp,u_cha
   if(thread_id % 3 == 1)
     {  
       TbbVec1_thread_1.push_back(n);
-      TbbVec2_thread_1.push_back(tlen);  
+      TbbVec2_thread_1.push_back(tlen);
+
+      iTbb_Vec_counts_thread_1::accessor cnt_thread_1;
+      TbbVec_counts_thread_1.insert(cnt_thread_1, n);
+      cnt_thread_1->second.push_back(tlen);    
     }
 
   if(thread_id %3 == 2)
     {  
       TbbVec1_thread_2.push_back(n);
-      TbbVec2_thread_2.push_back(tlen);  
+      TbbVec2_thread_2.push_back(tlen);
+
+      iTbb_Vec_counts_thread_2::accessor cnt_thread_2;
+      TbbVec_counts_thread_2.insert(cnt_thread_2, n);
+      cnt_thread_2->second.push_back(tlen);    
+      
     }
 
   if(thread_id %3 == 0)
     {  
       TbbVec1_thread_3.push_back(n);
-      TbbVec2_thread_3.push_back(tlen);  
+      TbbVec2_thread_3.push_back(tlen);
+      
+      iTbb_Vec_counts_thread_3::accessor cnt_thread_3;
+      TbbVec_counts_thread_3.insert(cnt_thread_3, n);
+      cnt_thread_3->second.push_back(tlen);    
+      
     }
       
   if(iphdr->protocol == IPPROTO_TCP)
@@ -757,6 +783,19 @@ void worker_func_2(thread_arg_t* arg) {
 
 	int new_size = 0;
     	
+	counter = 0;
+	for(  iTbb_Vec_counts_thread_1::iterator i=TbbVec_counts_thread_1.begin(); i!=TbbVec_counts_thread_1.end(); ++i )
+	  {
+	      for(auto itr = i->second.begin(); itr != i->second.end(); ++itr) {
+		key[counter] = (unsigned long long)i->first;
+		value[counter] = (long)*itr;
+		
+		counter++;
+	      }
+	  }
+
+	/*
+
 	tbb::concurrent_vector<unsigned long long>::iterator start1;
 	tbb::concurrent_vector<unsigned long long>::iterator end1 = TbbVec1_thread_1.end();
 
@@ -781,6 +820,7 @@ void worker_func_2(thread_arg_t* arg) {
 	    counter++;
 	    start2++;
 	  }
+	*/
 
 	cout << "thread:" << thread_id << ":" << TbbVec1_thread_1.size() << " lines - read done." << endl;
 
@@ -826,7 +866,19 @@ void worker_func_2(thread_arg_t* arg) {
 	value_out = (long *)malloc(vBytes);
 
 	int new_size = 0;
-    	
+
+	counter = 0;
+	for(  iTbb_Vec_counts_thread_2::iterator i=TbbVec_counts_thread_2.begin(); i!=TbbVec_counts_thread_2.end(); ++i )
+	  {
+	      for(auto itr = i->second.begin(); itr != i->second.end(); ++itr) {
+		key[counter] = (unsigned long long)i->first;
+		value[counter] = (long)*itr;
+		
+		counter++;
+	      }
+	  }
+
+	/*
 	tbb::concurrent_vector<unsigned long long>::iterator start1;
 	tbb::concurrent_vector<unsigned long long>::iterator end1 = TbbVec1_thread_2.end();
 
@@ -851,6 +903,7 @@ void worker_func_2(thread_arg_t* arg) {
 	    counter++;
 	    start2++;
 	  }
+	*/
 
 	cout << "thread:" << thread_id << ":" << TbbVec1_thread_2.size() << " lines - read done." << endl;
 
@@ -897,7 +950,19 @@ void worker_func_2(thread_arg_t* arg) {
 	value_out = (long *)malloc(vBytes);
 
 	int new_size = 0;
-    	
+
+	counter = 0;
+	for(  iTbb_Vec_counts_thread_3::iterator i=TbbVec_counts_thread_3.begin(); i!=TbbVec_counts_thread_3.end(); ++i )
+	  {
+	      for(auto itr = i->second.begin(); itr != i->second.end(); ++itr) {
+		key[counter] = (unsigned long long)i->first;
+		value[counter] = (long)*itr;
+		
+		counter++;
+	      }
+	  }
+
+	/*
 	tbb::concurrent_vector<unsigned long long>::iterator start1;
 	tbb::concurrent_vector<unsigned long long>::iterator end1 = TbbVec1_thread_3.end();
 
@@ -922,6 +987,7 @@ void worker_func_2(thread_arg_t* arg) {
 	    counter++;
 	    start2++;
 	  }
+	*/
 
 	cout << "thread:" << thread_id << ":" << TbbVec1_thread_3.size() << " lines - read done." << endl;
 
@@ -1057,12 +1123,6 @@ int main(int argc, char* argv[]) {
 	string dst_string = string(some_addr);
 
 	outputfile1 << src_string << "," << dst_string << "," << (long)i->second << endl; 
-	// outputfile1 << (unsigned long long)i->first << "," << (long)i->second << endl;;
-
-	/*
-	if(counter > 10)
-	  cout << src_string << "," << dst_string << "," << (long)i->second << endl; 
-	*/       
 
 	counter = counter + 1;
       }
@@ -1105,6 +1165,6 @@ int main(int argc, char* argv[]) {
       }
 
     outputfile2.close();
-
+  
     return 0;
 }
