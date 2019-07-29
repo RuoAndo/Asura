@@ -30,6 +30,8 @@ void transfer(unsigned long long *key, long *value, unsigned long long *key_out,
     // long *d_B;
     unsigned int t, travdirtime;
 
+    int GPU_number = 0;
+
     thrust::host_vector<unsigned long long> h_vec_key(data_size);
     thrust::host_vector<unsigned long long> h_vec_value(data_size);
 
@@ -40,8 +42,10 @@ void transfer(unsigned long long *key, long *value, unsigned long long *key_out,
     }
 
     start_timer(&t);
-    
-    cudaSetDevice(thread_id);
+
+    GPU_number = thread_id - 1;
+
+    cudaSetDevice(GPU_number);
     
     thrust::device_vector<unsigned long long> d_vec_key(data_size);
     thrust::device_vector<long> d_vec_value(data_size);
