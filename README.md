@@ -1,6 +1,6 @@
 2018.08 Currently, Asura can process 76,835,550 packets in 200-400 minutes.<br>
 2019.03 Currently, Asura can process 3,959,137,279 packets in 851m24.777s.<br>
-2019.07 Currently, Asuca 21 can process 465,913,560 (about 83G) packets in 41m4.667s with 90 logical CPU cores and 4 GPUs.
+2019.07 Currently, Asuca 21 can process 465,913,560 (about 83G) packets in 41m4.667s with 90 CPU cores and 4 GPUs.
 
 PLAN1(2018.10-2018.11): Cocurrent hash map (Intel TBB) is going to be adopted.
 <br>
