@@ -106,8 +106,8 @@ int main(int argc, const char* argv[])
 {
   int N = atoi(argv[3]);
   
-  int k = 10;
-  int number_of_iterations = 1000;
+  int k = 3;
+  int number_of_iterations = 10000;
   int counter = 0;
 
   std::vector<string> h_src(N);
@@ -207,8 +207,8 @@ int main(int argc, const char* argv[])
   thrust::host_vector<int> h_counts = d_counts;
 
   for (size_t cluster = 0; cluster < k; ++cluster) {
-    std::cout << h_mean_x[cluster] << " " << h_mean_y[cluster] << std::endl;
-    std::cout << h_counts[cluster] << std::endl;
+    std::cout << "clusterID:" << cluster << ":mean:" << h_mean_x[cluster] << " " << h_mean_y[cluster] << std::endl;
+    std::cout << "clusterID:" << cluster << ":counts:" << h_counts[cluster] << std::endl;
   }
 
   thrust::host_vector<int> h_clusterNo(d_clusterNo.size());
@@ -255,8 +255,13 @@ int main(int argc, const char* argv[])
 
   for(int i=0; i < N; i++)
   {
+	/*
 	outputfile << h_src[i] << "," << h_dst[i] << "," << h_x[i] << "," << h_y[i] << ",(id)" << h_clusterNo[i] 
 	<< "," << h_counts[h_clusterNo[i]] << "," << N << "," << percent[h_clusterNo[i]] << "%" << std::endl;
+	*/
+
+	outputfile << h_src[i] << "," << h_dst[i] << "," << h_x[i] << "," << h_y[i] << ",(id)" << h_clusterNo[i] 
+	<< "," << h_counts[h_clusterNo[i]] << "," << N << "," << percent[h_clusterNo[i]] << std::endl;
   }
 
   outputfile.close();
