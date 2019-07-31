@@ -55,15 +55,17 @@
 using namespace std;
 using namespace tbb;
 
-#define N 3
-#define WORKER_THREAD_NUM_PHASE1 3
-#define WORKER_THREAD_NUM_PHASE2 1
+#define N 100
+#define WORKER_THREAD_NUM_PHASE1 80
+#define WORKER_THREAD_NUM_PHASE2 3
 
 #define MAX_QUEUE_NUM N
 #define END_MARK_FNAME   "///"
 #define END_MARK_FLENGTH 3
 
 #define DISP_FREQ 100000
+
+static long all_packet_counts;
 
 /* srcIP, destIP */
 typedef struct _addrpair {
@@ -823,7 +825,8 @@ void worker_func_2(thread_arg_t* arg) {
 	*/
 
 	cout << "thread:" << thread_id << ":" << TbbVec1_thread_1.size() << " lines - read done." << endl;
-
+	all_packet_counts = all_packet_counts +  TbbVec1_thread_1.size();
+	
 	start_timer(&t);
 	cout << "transfer..." << endl;
 	transfer(key, value, key_out, value_out, kBytes, vBytes, TbbVec1_thread_1.size(), &new_size, thread_id);
@@ -906,7 +909,8 @@ void worker_func_2(thread_arg_t* arg) {
 	*/
 
 	cout << "thread:" << thread_id << ":" << TbbVec1_thread_2.size() << " lines - read done." << endl;
-
+	all_packet_counts = all_packet_counts +  TbbVec1_thread_2.size();
+	
 	start_timer(&t);
 	cout << "transfer..." << endl;
 	transfer(key, value, key_out, value_out, kBytes, vBytes, TbbVec1_thread_2.size(), &new_size, thread_id);
@@ -990,7 +994,8 @@ void worker_func_2(thread_arg_t* arg) {
 	*/
 
 	cout << "thread:" << thread_id << ":" << TbbVec1_thread_3.size() << " lines - read done." << endl;
-
+	all_packet_counts = all_packet_counts +  TbbVec1_thread_3.size();
+	  
 	start_timer(&t);
 	cout << "transfer..." << endl;
 	transfer(key, value, key_out, value_out, kBytes, vBytes, TbbVec1_thread_3.size(), &new_size, thread_id);
@@ -1165,6 +1170,8 @@ int main(int argc, char* argv[]) {
       }
 
     outputfile2.close();
-  
+
+    cout << "# of all packets processed: " << all_packet_counts << endl;
+    
     return 0;
 }
