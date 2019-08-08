@@ -1,10 +1,7 @@
-./build-asura.sh asura
-./build-gpu.sh reduce
+./build-asura-2.sh asura
 ./build-gpu.sh km-thrust
 
-time ./asura $1
-time ./reduce.sh tmp-asura-1
-time ./reduce.sh tmp-asura-2
-
-nLines=`wc -l tmp-asura-1-reduced`
-time ./km-thrust tmp-asura-1-reduced tmp-asura-2-reduced $nLines
+time ./asura $1 
+nLines=`wc -l tmp-asura-1`
+echo $nLines
+time ./km-thrust tmp-asura-1 tmp-asura-2 $nLines
