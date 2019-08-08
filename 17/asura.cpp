@@ -55,7 +55,7 @@
 using namespace std;
 using namespace tbb;
 
-#define N 3
+#define N 90
 #define WORKER_THREAD_NUM N
 #define MAX_QUEUE_NUM N
 #define END_MARK_FNAME   "///"
