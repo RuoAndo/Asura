@@ -9,7 +9,7 @@ PLAN2(2019.02-2019.03): NVidia Cuda Thrust is going to be adopted.
 <br>
 PLAN3(2019.04-): Multi-GPUs are going to be adopted.
 <br>
-PLAN4(2019.08-): NVLink is going to be adopted.
+<strike>PLAN4(2019.08-): NVLink is going to be adopted.</strike>
 
 <b>DEFCON 26 Demo</b>
 
