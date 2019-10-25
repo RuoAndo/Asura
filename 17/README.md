@@ -19,7 +19,7 @@ The rapid increase of security log has been imposing a great burden on security 
         # cd pcap 
         # wget https://download.netresec.com/pcap/maccdc-2012/maccdc2012_*.pcap.gz
         # cd ..
-	# ./build-asura.sh 
+	# ./build-asura-with-gpu.sh asura
         # ./asura pcap
 </pre>
 
