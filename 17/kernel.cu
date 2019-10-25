@@ -32,6 +32,8 @@ void transfer(unsigned long long *key, long *value, unsigned long long *key_out,
     unsigned int t, travdirtime;
     struct timespec startTime, endTime, sleepTime;
 
+    cout << "[GPU kernel]data size:" << data_size << ":kBytes:" << kBytes << ":vBytes:" << endl;
+
     int GPU_number = 0;
 
     thrust::host_vector<unsigned long long> h_vec_key(data_size);
@@ -50,13 +52,6 @@ void transfer(unsigned long long *key, long *value, unsigned long long *key_out,
     
     thrust::copy(h_vec_key.begin(), h_vec_key.end(), d_vec_key.begin());
     thrust::copy(h_vec_value.begin(), h_vec_value.end(), d_vec_value.begin());
-
-    //cout << "thread:" << thread_id << " - transfer done." << endl;
-    // travdirtime = stop_timer(&t);
-    // print_timer(travdirtime);
-
-    /* reduction */
-    // start_timer(&t);
 
     clock_gettime(CLOCK_REALTIME, &startTime);
     sleepTime.tv_sec = 0;
@@ -94,31 +89,6 @@ void transfer(unsigned long long *key, long *value, unsigned long long *key_out,
     }
     printf(" sec\n");
 
-    // cout << "thread:" << thread_id << " - reduction done." << endl;
-    // travdirtime = stop_timer(&t);
-    // print_timer(travdirtime);
-
-    /*
-    for(int i = 0; i < 5; i++)
-    {
-	cout << d_vec_key_out[i] << "," << d_vec_value_out[i] << endl;
-    }
-    */
-
-    /*
-    start_timer(&t);
-    for(int i = 0; i < new_size; i++)
-    {
-	key_out[i] =  d_vec_key_out[i];
-	value_out[i] =  d_vec_value_out[i];
-    }
-
-    cout << "thread:" << thread_id << " - transfer(rev) done with new_size " << new_size << endl;
-    travdirtime = stop_timer(&t);
-    print_timer(travdirtime);
-    */
-
-    // start_timer(&t);
     thrust::host_vector<unsigned long long> h_vec_key_2(data_size);
     thrust::host_vector<long> h_vec_value_2(data_size);
 
@@ -132,8 +102,6 @@ void transfer(unsigned long long *key, long *value, unsigned long long *key_out,
     }
 
     cout << "[GPU kernel] transfer(rev) done with new_size " << new_size_r << endl;
-    // travdirtime = stop_timer(&t);
-    // print_timer(travdirtime);
 
     (*new_size) = new_size_r;
 
