@@ -1,3 +1,5 @@
+“The universe is not complicated, there's just a lot of it.”  - Richard Feynman
+
 2018.08 Currently, Asura can process 76,835,550 packets in 200-400 minutes.<br>
 2019.03 Currently, Asura can process 3,959,137,279 packets in 851m24.777s.<br>
 2019.07 Currently, Asuca 21 can process 465,913,560 (about 83G) packets in 41m4.667s with 20 CPU cores and 4 GPUs.
