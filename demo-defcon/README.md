@@ -2,6 +2,8 @@
 
 Memo is updated! 2020/11/03
 
+Put 10 pcap files in pcap directory and run auto.sh (10 threads in this case).
+
 <pre>
 ~/tmp/Asura/demo-defcon# mkdir pcap                                                                                                                                                          
 ~/tmp/Asura/demo-defcon# cd pcap/    
@@ -16,7 +18,58 @@ xaa  xab  xac  xad  xae  xaf  xag  xah  xai  xaj
 
 ~/tmp/Asura/demo-defcon# time ./auto.sh 10 7 10 5 pcap
 </pre>
-  
+
+And you will get..
+
+<pre>
+
+CLUSTER,0,SIZE,0
+CLUSTER,1,SIZE,15
+CLUSTER,2,SIZE,2
+CLUSTER,3,SIZE,7
+CLUSTER,4,SIZE,10
+CLUSTER,5,SIZE,15
+CLUSTER,6,SIZE,12
+CLUSTER,7,SIZE,35
+CLUSTER,8,SIZE,0
+CLUSTER,9,SIZE,214
+Name "main::OUT1" used only once: possible typo at ./sort-percent.pl line 10.
+ 
+### RESULT ###
+sourceIP, destIP, clusterSize, anomaly rate
+192.168.21.100,192.168.204.45,2,0.64516%
+192.168.21.25,192.168.204.45,2,0.64516%
+192.168.202.94,192.168.24.100,7,2.25806%
+192.168.21.103,192.168.202.102,7,2.25806%
+192.168.26.100,192.168.202.81,7,2.25806%
+192.168.27.100,192.168.202.81,7,2.25806%
+192.168.28.100,192.168.202.81,7,2.25806%
+192.168.28.25,192.168.202.81,7,2.25806%
+192.168.28.254,192.168.202.76,7,2.25806%
+192.168.202.102,192.168.22.203,10,3.22581%
+192.168.202.90,192.168.21.101,10,3.22581%
+192.168.203.45,192.168.204.45,10,3.22581%
+192.168.22.102,192.168.204.45,10,3.22581%
+192.168.22.103,192.168.202.102,10,3.22581%
+192.168.23.202,192.168.204.45,10,3.22581%
+192.168.23.203,192.168.204.45,10,3.22581%
+192.168.23.253,192.168.204.45,10,3.22581%
+192.168.26.103,192.168.202.102,10,3.22581%
+192.168.26.152,192.168.204.45,10,3.22581%
+
+real    0m19.591s
+user    0m6.700s
+sys     0m9.901s
+finished at:20201103-175202
+proc time:529sec
+proc time:8min
+
+real    8m49.169s
+user    46m43.290s
+sys     0m47.023s
+
+</pre>
+
 <HR>
   
 ↓ Below is obsolete...
