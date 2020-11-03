@@ -5,6 +5,8 @@
 2019.07 Currently, Asuca 21 can process 465,913,560 (about 83G) packets in 41m4.667s with 20 CPU cores and 4 GPUs.
 2019.08 Currently, Asuca 21 can process 1,050,676,809 (about 690G) packets in 297m36.604s with 20 CPU cores and 4 GPUs.
 
+2020.11.03 defcon-demo/README.md is updated.
+
 PLAN1(2018.10-2018.11): Cocurrent hash map (Intel TBB) is going to be adopted.
 <br>
 PLAN2(2019.02-2019.03): NVidia Cuda Thrust is going to be adopted.
