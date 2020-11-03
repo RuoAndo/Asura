@@ -622,7 +622,8 @@ int traverse_file(char* filename, char* srchstr, int thread_id) {
 	      sprintf(tmp, "%02X", data);
 	      if(strcmp(tmp, s3)==0)
 		{
-		  if(thread_id % WORKER_THREAD_NUM == 0)
+		  // if(thread_id % WORKER_THREAD_NUM == 0 && disp_counter % 1000 ==0)
+		  if(disp_counter % 10000 ==0)
 		    printf("worker1:threadID:%d:filename:%s IP 080045:counter:%d\n", thread_id, filename, counter);
 		  
 		  fseek(fp,-1.5L,SEEK_CUR);
@@ -663,6 +664,7 @@ int traverse_file2(char* filename, char* srchstr, int thread_id) {
     u_char *ptr;
 	
     int counter = 0;
+    int disp_counter = 0;
 	
     fp = fopen(filename, "rb");
     if(fp == NULL){
@@ -696,8 +698,8 @@ int traverse_file2(char* filename, char* srchstr, int thread_id) {
 	      sprintf(tmp, "%02X", data);
 	      if(strcmp(tmp, s3)==0)
 		{
-		  if(thread_id % WORKER_THREAD_NUM == 0)
-		    {
+		  // if(thread_id % WORKER_THREAD_NUM == 0)
+		  if(disp_counter % 10000 == 0)		    {
 		      printf("worker2:threadID:%d:filename:%s IP 080045:counter:%d \n", thread_id, filename, counter);
 		    }
 		  
@@ -711,9 +713,11 @@ int traverse_file2(char* filename, char* srchstr, int thread_id) {
 		  fseek(fp,-3L,SEEK_CUR);
 		}
 	      
-	    } // if(strcmp(tmp,s2)	      
+	    } // if(strcmp(tmp,s2)
+	  
+	  disp_counter++;
 	} // if(strcmp(tmp,s1) *s1 = "08";
-	    
+   
     } // for (;;)
 
     fclose(fp);
