@@ -1,5 +1,7 @@
 # Demo at DEFCON 26
 
+Memo is updated! 2020/11/03
+
 <pre>
 ~/tmp/Asura/demo-defcon# mkdir pcap                                                                                                                                                          
 ~/tmp/Asura/demo-defcon# cd pcap/    
