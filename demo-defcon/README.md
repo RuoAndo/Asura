@@ -1,5 +1,24 @@
 # Demo at DEFCON 26
 
+<pre>
+~/tmp/Asura/demo-defcon# mkdir pcap                                                                                                                                                          
+~/tmp/Asura/demo-defcon# cd pcap/    
+
+~/tmp/Asura/demo-defcon# wget https://download.netresec.com/pcap/maccdc-2012/maccdc2012_00000.pcap.gz                                                                                        
+~/tmp/Asura/demo-defcon# gunzip maccdc2012_00000.pcap.gz 
+~/tmp/Asura/demo-defcon# split -n 10 maccdc2012_00000.pcap 
+
+~/tmp/Asura/demo-defcon# cd ..
+~/tmp/Asura/demo-defcon# ls pcap/
+xaa  xab  xac  xad  xae  xaf  xag  xah  xai  xaj
+
+~/tmp/Asura/demo-defcon# time ./auto.sh 10 7 10 5 pcap
+</pre>
+  
+<HR>
+  
+↓ Below is obsolete...
+
 Put any PCAP files in the directory:
 <pre>
 # mkdir demo
