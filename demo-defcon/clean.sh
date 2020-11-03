@@ -2,7 +2,7 @@ rm -rf process
 rm -rf process2
 rm -rf SSE
 
-rm -rf all*
+#rm -rf all*
 
 rm -rf *lbl
 rm -rf *rlbl

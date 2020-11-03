@@ -15,7 +15,8 @@ echo "started at:"$date_now > procTime
 
 time ./asura.sh $1 $5
 
-\cp reduced all
+rm -rf all 
+cp reduced all
 
 time ./first.sh all 10 $2 $3 $4 $5
 time ./second.sh all 10 $2 $3 $4 $5
