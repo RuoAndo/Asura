@@ -13,10 +13,12 @@ PLAN1(2018.10-2018.11): Cocurrent hash map (Intel TBB) is going to be adopted.
 <br>
 PLAN2(2019.02-2019.03): NVidia Cuda Thrust is going to be adopted.
 <br>
-PLAN3(2019.04-): Multi-GPUs are going to be adopted.
+<strike>PLAN3(2019.04-): Multi-GPUs are going to be adopted.</strike>
 <br>
 <strike>PLAN4(2019.08-): NVLink is going to be adopted.</strike>
-
+<br>
+PLAN5(2020.12-): More accurate packet header parsing leveraging Libtins is going to be adopted.
+<br>
 <b>DEFCON 26 Demo</b>
 
 <img src="asura.png" width=200 height=200>
