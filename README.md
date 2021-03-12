@@ -4,6 +4,9 @@
 
 Requirements: libtins - http://libtins.github.io/
 
+DEF CON 26
+https://www.youtube.com/watch?v=fJM-VWDRV6M
+
 <hr>
 
 # Quick test:
