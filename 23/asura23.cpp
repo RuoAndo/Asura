@@ -70,7 +70,7 @@ struct HashCompare {
 typedef concurrent_hash_map<std::string, int> CharTable;
 static CharTable table;
 
-typedef concurrent_hash_map<unsigned long long, int, HashCompare> CharTable2;
+typedef concurrent_hash_map<std::string, int> CharTable2;
 static CharTable2 table2;
 
 typedef struct _result {
@@ -108,15 +108,24 @@ bool callback(const PDU &pdu) {
   const TCP &tcp = pdu.rfind_pdu<TCP>();
 
   string source_ip = ip.src_addr().to_string();
-  
-  cout << "IP:" << ip.src_addr() << ":" << source_ip << ':' << tcp.sport() << " -> " << ip.dst_addr() << ':' << tcp.dport() << endl;
+  string source_port = ip.src_addr().to_string();
 
-  /*
+  string dest_ip = ip.dst_addr().to_string();
+  string dest_port = ip.dst_addr().to_string();
+
+  string info = source_ip + ":" + source_port + "=>" + dest_ip + ":" + dest_port; 
+  
+  cout << "IP:" << "[" << ip.tot_len() << "]" << ip.src_addr() << ":" << source_ip << ':' << tcp.sport() << ":" << " -> " << ip.dst_addr() << ':' << tcp.dport() << endl;
+
   CharTable::accessor a;
 
-  table.insert(a, ip.src_addr());
-  a->second += 1;     
-  */
+  table.insert(a, info);
+  a->second += 1;
+
+  CharTable2::accessor a2;
+
+  table2.insert(a2, info);
+  a2->second += int(ip.tot_len());     
 
   return true;
 }
@@ -141,7 +150,6 @@ int traverse_file(char* filename, char* srchstr, int thread_id) {
                 std::cerr << "[X] Error: " << ex.what() << '\n';
                 return -1;
         }
-
     
     return 0;
 }
@@ -366,8 +374,6 @@ int main(int argc, char* argv[]) {
 
     pthread_mutex_init(&result.mutex, NULL);
 
-    /* first scatter */
-    
     pthread_create(&master, NULL, (void*)master_func, (void*)&targ[0]);
     for (i = 1; i < thread_num; ++i)
       { 
@@ -383,15 +389,13 @@ int main(int argc, char* argv[]) {
     for( CharTable::iterator i=table.begin(); i!=table.end(); ++i )
     {
 
-      cout << i->first << "," << i->second << endl;
+      cout << "[counts]:" << i->first << "," << i->second << endl;
+    }
 
-      /*
-      if(counter < table.size() && (int)i->first > 0)
-	{
-	  s_vec_1.push_back((unsigned long long)i->first);
-	  s_vec_2.push_back((int)i->second);
-	}
-      */
+    for( CharTable2::iterator i=table2.begin(); i!=table2.end(); ++i )
+    {
+
+      cout << "[size]:" << i->first << "," << i->second << endl;
     }
    
     return 0;
