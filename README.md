@@ -6,6 +6,6 @@ Requirements: libtins - http://libtins.github.io/
 
 <hr>
 
-Quick test:
+# Quick test:
 
-# ./asura23 pcaps/
+$ ./asura23 pcaps/
