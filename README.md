@@ -1,5 +1,9 @@
 # Massive Pcap Analyzer with Massive Multithreading (DEF CON 26)
 
+“The universe is not complicated, there's just a lot of it.” - Richard Feynman
+
+<img src="asura.jpeg">
+
 <pre>
 Required: 
 libtins
