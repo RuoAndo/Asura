@@ -30,8 +30,9 @@ In experiment, Asura One has processed about 400,000,000 packets with 83GB PCAP 
 　　　   X.X.X.X,Z.Z.Z.Z -> 5 (73445,48),288,118644,0.242743%
 </pre>
 　
-*If precentage is low, the pair(srcIP,srcPort->dstIP,dstPort) could be anomaly. 
-*Packet dump was drastically reduced from 83GB to 7MB with about 110,000 extracted flow vectors which are useful for the further careful inspection by Wireshark.
+If precentage is low, the pair(srcIP,srcPort->dstIP,dstPort) could be anomaly. 
+
+Packet dump was drastically reduced from 83GB to 7MB with about 110,000 extracted flow vectors which are useful for the further careful inspection by Wireshark.
 
 6.Procedure 1: extracting flow vector {<srcIP, dstIP>, X, Y}
 <pre>
