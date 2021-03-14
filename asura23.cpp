@@ -17,8 +17,11 @@
 #include <cmath>
 #include <ctime>
 #include <iostream>
+#include <fstream>
 #include <sstream>
+
 #include "timer.h" 
+#include "kmeans.h"
 
 #define MB (1048576.0)
 #define UNUSE(x) (void)(x)
@@ -115,7 +118,7 @@ bool callback(const PDU &pdu) {
 
   string info = source_ip + ":" + source_port + "=>" + dest_ip + ":" + dest_port; 
   
-  cout << "IP:" << "[" << ip.tot_len() << "]" << ip.src_addr() << ":" << source_ip << ':' << tcp.sport() << ":" << " -> " << ip.dst_addr() << ':' << tcp.dport() << endl;
+  // cout << "IP:" << "[" << ip.tot_len() << "]" << ip.src_addr() << ":" << source_ip << ':' << tcp.sport() << ":" << " -> " << ip.dst_addr() << ':' << tcp.dport() << endl;
 
   CharTable::accessor a;
 
@@ -386,18 +389,159 @@ int main(int argc, char* argv[]) {
     travdirtime = stop_timer(&t);
     print_timer(travdirtime);
 
+    std::vector<string> s_vec_1;
+    std::vector<float> s_vec_2;
+    std::vector<string> s_vec_3;
+    std::vector<float> s_vec_4;
+    
     for( CharTable::iterator i=table.begin(); i!=table.end(); ++i )
     {
-
+      s_vec_1.push_back(i->first);
+      s_vec_2.push_back((float)i->second);
+      
       cout << "[counts]:" << i->first << "," << i->second << endl;
     }
 
     for( CharTable2::iterator i=table2.begin(); i!=table2.end(); ++i )
     {
-
+      s_vec_3.push_back(i->first);
+      s_vec_4.push_back((float)i->second);
+      
       cout << "[size]:" << i->first << "," << i->second << endl;
     }
-   
+
+    std::remove("reduced");
+    ofstream outputfile3("reduced");
+
+    cout << "reduced" << endl;
+    
+    for(int i = 0; i < s_vec_1.size(); i++)
+      {
+	/*
+	double tmp_div;
+	if (s_vec_4[i] == 0)
+	  tmp_div = 0;
+	else if (s_vec_4[i] > 0)
+	  tmp_div =  (double)s_vec_2[i] / (double)s_vec_4[i];
+	*/	
+
+	cout << s_vec_1[i] << "," << s_vec_2[i] << "," << s_vec_4[i] << endl;
+	outputfile3 << s_vec_1[i] << "," << s_vec_2[i] << "," << s_vec_4[i] << endl;
+      }
+
+    outputfile3.close();
+
+    cout << "strat KMeans " << endl;
+    
+    const size_t SQRT_K = 2;
+    const size_t K = SQRT_K*SQRT_K;
+    const size_t M = s_vec_1.size();
+
+    cout << "data size:" << M << endl;
+    cout << "cluster size:" << K << endl;
+    
+    point* points;
+    points = (struct point *)malloc(M*sizeof(struct point));
+
+    point* centroid;
+    centroid = (struct point *)malloc(M*sizeof(struct point));
+
+    cluster_id* id;
+    id = (unsigned short *)malloc(M*sizeof(unsigned short));
+
+    std::vector<string> pair; 
+    
+    for (int i = 0; i < M; i++) {
+
+      point& p = points[i];
+
+      p.x = (float)s_vec_2[i];
+      p.y = (float)s_vec_4[i];
+      pair.push_back(s_vec_1[i]);
+    }
+
+    start_timer(&t);
+    tbb_asura::do_k_means( M, points, K, id, centroid );
+
+    cout << "KMeans finished" << endl;
+    
+    /*
+    travdirtime = stop_timer(&t);
+    print_timer(travdirtime);
+    */
+
+
+    
+#if 1
+    int* counts;
+    counts = (int *)malloc(K*sizeof(int));
+
+    for( size_t i=0; i<M; ++i ) {
+      counts[id[i]] = 0;
+    }
+    
+    for( size_t i=0; i<M; ++i ) {
+      counts[id[i]]++;
+    }
+
+    std::remove("clustered");
+    ofstream outputfile4("clustered");
+
+    for( size_t i=0; i<M; ++i ) {
+
+      float percent = (float)counts[id[i]]/(float)M;
+      cout << pair[i] << ", clusterID:" << id[i] << ", data(" << points[i].x << "," << points[i].y << ")" << ", " << (int)(percent * 100) << "%" << endl;
+
+      /*
+	    unsigned long pair_long = std::stoul(pair[i]);
+      
+	    std::bitset<64> bset_pair = std::bitset<64>(pair_long);   
+	    string bset_pair_string = bset_pair.to_string();
+	    
+	    std::string ip1 = bset_pair_string.substr(0, 8);
+	    std::string ip2 = bset_pair_string.substr(8, 8);
+	    std::string ip3 = bset_pair_string.substr(16, 8);
+	    std::string ip4 = bset_pair_string.substr(24, 8);
+
+	    std::bitset<8> ip1_bset = std::bitset<8>(ip1);
+	    std::bitset<8> ip2_bset = std::bitset<8>(ip2);
+	    std::bitset<8> ip3_bset = std::bitset<8>(ip3);
+	    std::bitset<8> ip4_bset = std::bitset<8>(ip4);
+
+	    outputfile4 << ip1_bset.to_ulong() << "." << ip2_bset.to_ulong() << "." << ip3_bset.to_ulong() << "." << ip4_bset.to_ulong() << ",";
+
+	    std::string ip5 = bset_pair_string.substr(32, 8);
+	    std::string ip6 = bset_pair_string.substr(40, 8);
+	    std::string ip7 = bset_pair_string.substr(48, 8);
+	    std::string ip8 = bset_pair_string.substr(56, 8);
+
+	    std::bitset<8> ip5_bset = std::bitset<8>(ip5);
+	    std::bitset<8> ip6_bset = std::bitset<8>(ip6);
+	    std::bitset<8> ip7_bset = std::bitset<8>(ip7);
+	    std::bitset<8> ip8_bset = std::bitset<8>(ip8);
+
+	    outputfile4 << ip5_bset.to_ulong() << "." << ip6_bset.to_ulong() << "." << ip7_bset.to_ulong() << "." << ip8_bset.to_ulong() << " -> ";
+
+	    float percent = (float)counts[id[i]]/(float)M;
+
+	    outputfile4 << id[i] << " (" << points[i].x << "," << points[i].y << ")," << counts[id[i]] << "," << M << "," << percent << endl;
+	
+      */    	
+    }
+
+    outputfile4.close();
+
+#endif
+    
+#if 0
+    printf("centroids = ");
+    for( size_t j=0; j<K; ++j ) {
+        printf("(%g %g)",centroid[j].x,centroid[j].y);
+    }
+    printf("\n");
+#endif
+    
+    
     return 0;
 }
 
