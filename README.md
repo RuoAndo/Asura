@@ -9,6 +9,9 @@ Required:
 libtins
 http://libtins.github.io/ 
 Intel TBB
+
+quick test:
+# ./asura pcaps
 </pre>
 With the rapid increase of network traffic, we are suffering the long processing time in coping with large packet capture file in many aspects such as network diagnosis, incidents response and CTF. Wireshark and Linux grep command are basically run in single-process mode and are thus not good at analyzing tens or hundreds gigabytes of packet dump in reasonable processing time. On the other hand, high performance devices such as GPGPU are still bulky and expensive for running on our laptop.
 
