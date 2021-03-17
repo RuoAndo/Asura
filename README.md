@@ -10,6 +10,9 @@ libtins
 http://libtins.github.io/ 
 Intel TBB
 
+# apt install libpcap-dev
+# apt install libtins-dev
+
 quick test:
 # ./asura pcaps
 </pre>
