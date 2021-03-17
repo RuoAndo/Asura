@@ -34,6 +34,8 @@ In experiment, Asura One has processed about 400,000,000 packets with 83GB PCAP 
 	# mkdir pcap
         # cd pcap 
 	# wget -r -l 4 https://download.netresec.com/pcap/ists-12/2015-03-07/
+	# cp -r download.netresec.com/pcap/ists-12/2015-03-07/* .
+	# rm -rf download.netresec.com
         # cd ..
 	# ./build-asura.sh 
         # ./asura pcap
