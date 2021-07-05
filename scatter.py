@@ -10,7 +10,7 @@ data_set = np.loadtxt(
 for data in data_set:
     plt.scatter(data[0], data[1])
 
-plt.title("packets")
+plt.title("packets- src=>dst")
 plt.xlabel("counts")
 plt.ylabel("bytes")
 plt.grid()

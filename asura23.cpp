@@ -415,6 +415,9 @@ int main(int argc, char* argv[]) {
     std::remove("reduced");
     ofstream outputfile3("reduced");
 
+    std::remove("reduced2");
+    ofstream outputfile3_2("reduced2");
+
     cout << "reduced" << endl;
     
     for(int i = 0; i < s_vec_1.size(); i++)
@@ -429,9 +432,11 @@ int main(int argc, char* argv[]) {
 
 	cout << s_vec_1[i] << "," << s_vec_2[i] << "," << s_vec_4[i] << endl;
 	outputfile3 << s_vec_1[i] << "," << s_vec_2[i] << "," << s_vec_4[i] << endl;
+	outputfile3_2 << s_vec_2[i] << "," << s_vec_4[i] << endl;
       }
 
     outputfile3.close();
+    outputfile3_2.close();
 
     cout << "strat KMeans " << endl;
     
