@@ -111,23 +111,25 @@ bool callback(const PDU &pdu) {
   const TCP &tcp = pdu.rfind_pdu<TCP>();
 
   string source_ip = ip.src_addr().to_string();
-  string source_port = ip.src_addr().to_string();
+  string source_port = std::to_string(tcp.sport());
 
   string dest_ip = ip.dst_addr().to_string();
-  string dest_port = ip.dst_addr().to_string();
+  string dest_port = std::to_string(tcp.dport());
 
-  string info = source_ip + ":" + source_port + "=>" + dest_ip + ":" + dest_port; 
+  string info = source_ip + ":" + source_port + "=>" + dest_ip + ":" + dest_port;
+  
+  string info2 = source_ip + "=>" + dest_ip; 
   
   // cout << "IP:" << "[" << ip.tot_len() << "]" << ip.src_addr() << ":" << source_ip << ':' << tcp.sport() << ":" << " -> " << ip.dst_addr() << ':' << tcp.dport() << endl;
 
   CharTable::accessor a;
 
-  table.insert(a, info);
+  table.insert(a, info2);
   a->second += 1;
 
   CharTable2::accessor a2;
 
-  table2.insert(a2, info);
+  table2.insert(a2, info2);
   a2->second += int(ip.tot_len());     
 
   return true;
