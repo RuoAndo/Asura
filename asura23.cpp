@@ -498,6 +498,7 @@ int main(int argc, char* argv[]) {
 
       float percent = (float)counts[id[i]]/(float)M;
       cout << pair[i] << ", clusterID:" << id[i] << ", data(" << points[i].x << "," << points[i].y << ")" << ", " << (int)(percent * 100) << "%" << endl;
+      outputfile4 << pair[i] << ", clusterID:" << id[i] << ", data(" << points[i].x << "," << points[i].y << ")" << ", " << (int)(percent * 100) << "%" << endl;
 
       /*
 	    unsigned long pair_long = std::stoul(pair[i]);
