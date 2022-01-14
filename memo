@@ -1,2 +1,16 @@
 source="/mnt/data/Usenix_LISA19/application/cpu/ingress_sinet/*" host="h-gpu03" sourcetype="csv"  sourcetype="csv" earliest=-5d@d latest=-1d@d
 
+# wget http://ftp.riken.jp/Linux/cern/centos/7/updates/x86_64/Packages/Packages/libpcap-devel-1.5.3-12.el7.x86_64.rpm
+# rpm -ivh libpcap-devel-1.5.3-12.el7.x86_64.rpm 
+# git clone https://github.com/mfontanini/libtins.git
+# cd libtins/
+# mkdir build
+# cmake ../
+# yum install cmake
+# cmake ../ -DLIBTINS_ENABLE_CXX11=1
+# make 
+# make install
+
+# wget -l 1 -r https://download.netresec.com/pcap/smia-2012/bcn.ex,_node13-10/ --no-check-certificate
+# python scatter.py reduced2
+
