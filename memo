@@ -1,0 +1,2 @@
+shuf -n 1000 reduced2 > tmp
+
