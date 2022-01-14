@@ -87,3 +87,18 @@ If precentage is low, the pair(srcIP,srcPort->dstIP,dstPort) could be anomaly.
 
 8. Processing time: about 30 minutes for about 400,000,000 packets
 
+<hr>
+2022-01-11
+libpcap and libtins are required.
+
+<pre>
+# apt install libpcap-dev
+# git clone https://github.com/mfontanini/libtins.git
+# cd libtins/
+# apt-get install libpcap-dev libssl-dev cmake
+# mkdir build
+# cd build/
+# cmake ../ -DLIBTINS_ENABLE_CXX11=1
+# make install
+# ldconfig
+</pre>
