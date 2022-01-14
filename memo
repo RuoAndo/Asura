@@ -1,2 +1,42 @@
 source="/mnt/data/Usenix_LISA19/application/cpu/ingress_sinet/*" host="h-gpu03" sourcetype="csv"  sourcetype="csv" earliest=-5d@d latest=-1d@d
 
+19991   2022-01-14 09:08:38  git clone https://github.com/RuoAndo/Asura.git
+19992   2022-01-14 09:08:42  cd Asura/
+19993   2022-01-14 09:08:43  make
+19994   2022-01-14 09:08:55  yum search pcap
+19995   2022-01-14 09:09:06  yum install libpcap-devel
+19996   2022-01-14 09:10:53  wget libpcap-devel-1.5.3-12.el7.x86_64.rpm
+19997   2022-01-14 09:11:17  wget http://ftp.riken.jp/Linux/cern/centos/7/updates/x86_64/Packages/Packages/libpcap-devel-1.5.3-12.el7.x86_64.rpm
+19998   2022-01-14 09:11:24  rpm -ivh libpcap-devel-1.5.3-12.el7.x86_64.rpm 
+19999   2022-01-14 09:11:37  yum install libpcap
+20000   2022-01-14 09:11:48  rpm -ivh libpcap-devel-1.5.3-12.el7.x86_64.rpm 
+20001   2022-01-14 09:11:54  make
+20002   2022-01-14 09:12:02  yum install libtins
+20003   2022-01-14 09:12:11  yum install libtins-devel
+20004   2022-01-14 09:12:18  yum search libtins
+20005   2022-01-14 09:13:13  yum install openssl-devel
+20006   2022-01-14 09:13:31  yum install openssl-devel
+20007   2022-01-14 09:14:29  git clone https://github.com/mfontanini/libtins.git
+20008   2022-01-14 09:14:34  cd libtins/
+20009   2022-01-14 09:14:36  mkdir build
+20010   2022-01-14 09:14:39  cd build/
+20011   2022-01-14 09:14:39  ls
+20012   2022-01-14 09:14:49  cmake ../
+20013   2022-01-14 09:14:56  yum install cmake
+20014   2022-01-14 09:15:06  cmake ../
+20015   2022-01-14 09:15:10  make 
+20016   2022-01-14 09:15:55  cmake ../
+20017   2022-01-14 09:15:56  make
+20018   2022-01-14 09:16:19  cmake ../ -DLIBTINS_ENABLE_CXX11=1
+20019   2022-01-14 09:16:22  make 
+20020   2022-01-14 09:16:29  make clean
+20021   2022-01-14 09:16:32  cmake claen
+20022   2022-01-14 09:16:35  cmake clean
+20023   2022-01-14 09:16:44  cmake ../ -DLIBTINS_ENABLE_CXX11=1 clean
+20024   2022-01-14 09:16:47  make 
+20025   2022-01-14 09:17:49  make install
+20026   2022-01-14 09:17:56  cd ../../
+20027   2022-01-14 09:17:57  ls
+20028   2022-01-14 09:17:59  make
+20029   2022-01-14 09:18:03  history
+
