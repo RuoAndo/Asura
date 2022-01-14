@@ -1,8 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+import sys
+
+
+args = sys.argv
+
 data_set = np.loadtxt(
-    fname="tmp",
+    fname=args[1],
     dtype="float",
     delimiter=",",
 )
