@@ -1,6 +1,6 @@
 LIBROOT 	= /usr/local/lib
 CXXFLAGS 	= -Wall -Wextra -Wpedantic -std=c++11 -Os -O2 -fpermissive -lpthread -ltbb
-LDFLAGS 	= -L$(LIBROOT) -I$(LIBROOT) -ltins -lpcap
+LDFLAGS 	= -L$(LIBROOT) -I$(LIBROOT) -ltins -lpcap -L/usr/local/lib/
 
 PROGS 	= asura
 
